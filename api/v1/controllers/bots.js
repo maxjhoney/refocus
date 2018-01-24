@@ -111,7 +111,7 @@ module.exports = {
           }
 
           o.dataValues.token = jwtUtil
-            .createToken(seqObj.name, seqObj.name);
+            .createToken(seqObj.name, seqObj.name, { IsBot: true });
           return res.status(httpStatus.CREATED)
             .json(u.responsify(o, helper, req.method));
         })

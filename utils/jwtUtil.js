@@ -179,11 +179,35 @@ function verifyCollectorToken(req, cb) {
  * @throws {ForbiddenError} If a collector record matching the username is
  *   not found
  */
-function verifyBotToken(token) {
+function verifyBotToken(_token, req, cb) {
+  const token = _token || req.session.token || req.headers.authorization;
+  let decodedData;
   return jwtVerifyAsync(token, secret, {})
-  .then((decodedData) => Bot.findOne({
-    where: { name: decodedData.username },
-  })).then((bot) => bot);
+  .then((_decodedData) => {
+    decodedData = _decodedData;
+    return Bot.findOne({ where: { name: decodedData.username }, });
+  })
+  .then((bot) => {
+    if (!bot) {
+      throw new apiErrors.ForbiddenError({
+        explanation: 'Invalid Token.',
+      });
+    }
+    if (req) {
+      assignHeaderValues(req, decodedData);
+    }
+
+    if (cb) {
+      return cb();
+    }
+
+    return undefined;
+  })
+  .catch(() => {
+    throw new apiErrors.ForbiddenError({
+      explanation: 'Invalid/No Token provided.',
+    });
+  });
 } // verifyBotToken
 
 /**
@@ -273,7 +297,11 @@ function verifyToken(req, cb) {
 
       return verifyCollectorToken(req, cb)
       .then((_ret) => _ret)
-      .catch(() => handleInvalidToken(cb));
+      .catch(() => {
+        return verifyBotToken(null, req, cb)
+        .then((__ret) => __ret)
+        .catch(() => handleInvalidToken(cb));
+      });
     });
   }
 
