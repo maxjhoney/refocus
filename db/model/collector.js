@@ -105,7 +105,7 @@ module.exports = function collector(seq, dataTypes) {
         assoc.currentGenerators = Collector.belongsToMany(models.Generator, {
           as: 'currentGenerators',
           through: 'GeneratorCollectors',
-          foreignKey: 'collectorId',
+          foreignKey: 'CollectorId',
         });
 
         assoc.createdBy = Collector.belongsTo(models.User, {
