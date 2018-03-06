@@ -56,6 +56,22 @@ function debugMessage(msg, obj){
   }
 }
 
+function drag(e) {
+  e.dataTransfer.setData("text", e.target.id);
+}
+
+function allowDrop(ev, where) {
+    ev.preventDefault();
+}
+
+function drop(ev, where) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    where.appendChild(document.getElementById(data));
+}
+
+
+
 /**
  * Creates headers for each bot added to the UI
  *
@@ -79,6 +95,7 @@ function createHeader(bot) {
     'slds-p-horizontal_small ' +
     'slds-theme_shade ';
   text.innerHTML = bot.name;
+  text.style.cursor = 'pointer';
 
   const circle = document.createElement('div');
   if (bot.active) {
@@ -145,6 +162,17 @@ function parseBot(bot, i) {
   // Get the bots section of the page
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
+
+  botContainer.setAttribute(
+    'draggable',
+    'true'
+  );
+
+  botContainer.addEventListener('dragstart', (e) => {
+    drag(e);
+  });
+
+
   const contentSection = document.createElement('div');
   contentSection.className = 'slds-section__content';
   const headerSection = createHeader(bot);
@@ -367,6 +395,32 @@ function handleEvents(event) {
 window.onload = () => {
   activeToggle.addEventListener('click', toggleConfirmationModal);
   activeToggle.addEventListener('refocus.events', handleEvents, false);
+
+  botsLeft.addEventListener('drop', (e) => {
+    drop(e, botsLeft);
+  });
+
+  botsMiddle.addEventListener('drop', (e) => {
+    drop(e, botsMiddle);
+  });
+
+  botsRight.addEventListener('drop', (e) => {
+    drop(e, botsRight);
+  });
+
+  botsLeft.addEventListener('dragover', (e) => {
+    allowDrop(e, botsLeft);
+  });
+
+  botsMiddle.addEventListener('dragover', (e) => {
+    allowDrop(e, botsMiddle);
+  });
+
+  botsRight.addEventListener('dragover', (e) => {
+    allowDrop(e, botsRight);
+  });
+
+
   confirmButton.onclick = roomStateChanged;
   declineButton.onclick = closeConfirmationModal;
 
