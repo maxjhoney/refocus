@@ -145,7 +145,6 @@ function parseBot(bot, i) {
   // Get the bots section of the page
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
-  botContainer.className = '';
   const contentSection = document.createElement('div');
   contentSection.className = 'slds-section__content';
   const headerSection = createHeader(bot);
@@ -160,13 +159,9 @@ function parseBot(bot, i) {
     headerSection.appendChild(footerSection);
     botContainer.appendChild(headerSection);
 
-    while(i > 2) {
-      i-=3;
-    }
-
-    if (i === 0) {
+    if ((i+1) % 3 === 1) {
       botsLeft.appendChild(botContainer);
-    } else if (i === 1) {
+    } else if ((i+1) % 3 === 2) {
       botsMiddle.appendChild(botContainer);
     } else {
       botsRight.appendChild(botContainer);
@@ -219,10 +214,6 @@ function setupSocketIOClient(bots) {
     bots.forEach((bot, i) => {
       parseBot(bot.body, i);
     });
-
-    botsContainer.appendChild(botsLeft);
-    botsContainer.appendChild(botsMiddle);
-    botsContainer.appendChild(botsRight);
   });
 
   socket.on(settingsChangedEventName, (data) => {
