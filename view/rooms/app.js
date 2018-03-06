@@ -62,12 +62,21 @@ function drag(e) {
 
 function allowDrop(ev, where) {
     ev.preventDefault();
+    where.style.boxShadow = 'inset 0 0 0px 5px #006fd2';
+    where.style.backgroundColor = '#efefef';
+}
+
+function dragLeave(ev, where) {
+    where.style.boxShadow = '';
+        where.style.backgroundColor = '#fdfdfd';
 }
 
 function drop(ev, where) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("text");
     where.appendChild(document.getElementById(data));
+    where.style.boxShadow = '';
+    where.style.backgroundColor = '#fdfdfd';
 }
 
 
@@ -418,6 +427,18 @@ window.onload = () => {
 
   botsRight.addEventListener('dragover', (e) => {
     allowDrop(e, botsRight);
+  });
+
+  botsLeft.addEventListener('dragleave', (e) => {
+    dragLeave(e, botsLeft);
+  });
+
+  botsMiddle.addEventListener('dragleave', (e) => {
+    dragLeave(e, botsMiddle);
+  });
+
+  botsRight.addEventListener('dragleave', (e) => {
+    dragLeave(e, botsRight);
   });
 
 
