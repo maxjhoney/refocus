@@ -62,21 +62,24 @@ function drag(e) {
 
 function allowDrop(ev, where) {
     ev.preventDefault();
-    where.style.boxShadow = 'inset 0 0 0px 5px #006fd2';
-    where.style.backgroundColor = '#efefef';
+    //where.style.boxShadow = 'inset rgb(0, 112, 210) 0px 0px 0px 4px';
+    where.style.opacity = '0.5';
+    where.style.filter = 'blur(3px)';
 }
 
 function dragLeave(ev, where) {
     where.style.boxShadow = '';
-        where.style.backgroundColor = '#fdfdfd';
-}
+     where.style.opacity = '1';
+     where.style.filter = 'none';
+   }
 
 function drop(ev, where) {
     ev.preventDefault();
     var data = ev.dataTransfer.getData("text");
     where.appendChild(document.getElementById(data));
+     where.style.opacity = '1';
     where.style.boxShadow = '';
-    where.style.backgroundColor = '#fdfdfd';
+    where.style.filter = 'none';
 }
 
 
