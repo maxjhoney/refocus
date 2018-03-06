@@ -15,6 +15,9 @@
 const ZERO = 0;
 const ONE = 1;
 const botsContainer = document.getElementById('botsContainer');
+const botsLeft = document.getElementById('botsLeftColumn');
+const botsMiddle = document.getElementById('botsMiddleColumn');
+const botsRight = document.getElementById('botsRightColumn');
 const activeToggle = document.getElementById('activeToggle');
 const confirmButton = document.getElementById('confirm_button');
 const declineButton = document.getElementById('decline_button');
@@ -142,7 +145,7 @@ function parseBot(bot) {
   // Get the bots section of the page
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
-  botContainer.className = 'slds-large-size--1-of-3';
+  botContainer.className = 'slds-col slds-size_1-of-3';
   const contentSection = document.createElement('div');
   contentSection.className = 'slds-section__content';
   const headerSection = createHeader(bot);
@@ -156,7 +159,7 @@ function parseBot(bot) {
     headerSection.appendChild(contentSection);
     headerSection.appendChild(footerSection);
     botContainer.appendChild(headerSection);
-    botsContainer.appendChild(botContainer);
+    botContainer.appendChild(botsContainer);
   }
 
   // go through zipEntries that arent 'index.html'
@@ -202,7 +205,7 @@ function setupSocketIOClient(bots) {
         document.getElementById(bot.body.name + '-script').remove();
       }
     });
-    bots.forEach((bot) => {
+    bots.forEach((bot, i) => {
       parseBot(bot.body);
     });
   });
