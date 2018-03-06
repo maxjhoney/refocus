@@ -135,7 +135,7 @@ function createFooter(bot) {
  *
  * @param {Object} bot - Bot response with UI
  */
-function parseBot(bot) {
+function parseBot(bot, i) {
   // Unzip bots
   const zip = new AdmZip(new Buffer(bot.ui.data));
   const zipEntries = zip.getEntries();
@@ -145,7 +145,7 @@ function parseBot(bot) {
   // Get the bots section of the page
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
-  botContainer.className = 'slds-col slds-size_1-of-3';
+  botContainer.className = '';
   const contentSection = document.createElement('div');
   contentSection.className = 'slds-section__content';
   const headerSection = createHeader(bot);
@@ -159,7 +159,18 @@ function parseBot(bot) {
     headerSection.appendChild(contentSection);
     headerSection.appendChild(footerSection);
     botContainer.appendChild(headerSection);
-    botContainer.appendChild(botsContainer);
+
+    while(i > 2) {
+      i-=3;
+    }
+
+    if (i === 0) {
+      botsLeft.appendChild(botContainer);
+    } else if (i === 1) {
+      botsMiddle.appendChild(botContainer);
+    } else {
+      botsRight.appendChild(botContainer);
+    }
   }
 
   // go through zipEntries that arent 'index.html'
@@ -206,8 +217,12 @@ function setupSocketIOClient(bots) {
       }
     });
     bots.forEach((bot, i) => {
-      parseBot(bot.body);
+      parseBot(bot.body, i);
     });
+
+    botsContainer.appendChild(botsLeft);
+    botsContainer.appendChild(botsMiddle);
+    botsContainer.appendChild(botsRight);
   });
 
   socket.on(settingsChangedEventName, (data) => {
