@@ -41,6 +41,7 @@ let _isActive;
 let botInfo = {};
 const DEBUG_REALTIME = window.location.href.split(/[&\?]/)
   .includes('debug=REALTIME');
+let moving;
 
 /**
  * Creates headers for each bot added to the UI
@@ -57,32 +58,47 @@ function debugMessage(msg, obj){
 }
 
 function drag(e) {
-  e.dataTransfer.setData("text", e.target.id);
+  if (botsLeft.offsetWidth === botsContainer.offsetWidth || !moving) {
+    return e.preventDefault();
+  }
+
+  e.dataTransfer.setData('text', e.target.id);
+  botsLeft.style.minHeight = '100vh';
+  botsMiddle.style.minHeight = '100vh';
+  botsRight.style.minHeight = '100vh';
 }
 
 function allowDrop(ev, where) {
-    ev.preventDefault();
-    //where.style.boxShadow = 'inset rgb(0, 112, 210) 0px 0px 0px 4px';
-    where.style.opacity = '0.5';
-    where.style.filter = 'blur(3px)';
+  ev.preventDefault();
+  where.style.opacity = '0.7';
+  where.style.filter = 'blur(1px)';
 }
 
 function dragLeave(ev, where) {
-    where.style.boxShadow = '';
-     where.style.opacity = '1';
-     where.style.filter = 'none';
-   }
-
-function drop(ev, where) {
-    ev.preventDefault();
-    var data = ev.dataTransfer.getData("text");
-    where.appendChild(document.getElementById(data));
-     where.style.opacity = '1';
-    where.style.boxShadow = '';
-    where.style.filter = 'none';
+  where.style.boxShadow = '';
+ where.style.opacity = '1';
+ where.style.filter = 'none';
 }
 
+function drop(ev, where) {
+  ev.preventDefault();
+  const data = ev.dataTransfer.getData('text');
+  where.appendChild(document.getElementById(data));
+  where.style.opacity = '1';
+  where.style.boxShadow = '';
+  where.style.filter = 'none';
+  botsLeft.style.minHeight = '0px';
+  botsMiddle.style.minHeight = '0px';
+  botsRight.style.minHeight = '0px';
+}
 
+function mousedown(e) {
+  if (e.target.id === 'title') {
+    moving = true;
+  } else {
+    moving = false;
+  }
+}
 
 /**
  * Creates headers for each bot added to the UI
@@ -123,6 +139,8 @@ function createHeader(bot) {
   }
 
   circle.className = 'slds-float_right';
+
+  text.id = "title";
 
   title.appendChild(text);
   text.appendChild(circle);
@@ -182,6 +200,10 @@ function parseBot(bot, i) {
 
   botContainer.addEventListener('dragstart', (e) => {
     drag(e);
+  });
+
+  botContainer.addEventListener('mousedown', (e) => {
+    mousedown(e);
   });
 
 
