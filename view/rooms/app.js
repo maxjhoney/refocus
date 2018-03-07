@@ -14,10 +14,13 @@
  */
 const ZERO = 0;
 const ONE = 1;
+const TWO = 2;
+const THREE = 3;
 const botsContainer = document.getElementById('botsContainer');
 const botsLeft = document.getElementById('botsLeftColumn');
 const botsMiddle = document.getElementById('botsMiddleColumn');
 const botsRight = document.getElementById('botsRightColumn');
+const botsContainerColumns = [botsLeft, botsMiddle, botsRight];
 const activeToggle = document.getElementById('activeToggle');
 const confirmButton = document.getElementById('confirm_button');
 const declineButton = document.getElementById('decline_button');
@@ -63,41 +66,51 @@ function drag(e) {
   }
 
   e.dataTransfer.setData('text', e.target.id);
-  botsLeft.style.minHeight = '100vh';
-  botsMiddle.style.minHeight = '100vh';
-  botsRight.style.minHeight = '100vh';
+
+  botsContainerColumns.forEach((c) => {
+    c.setAttribute(
+      'style',
+      'min-height:100vh;'
+    );
+  });
 }
 
-function allowDrop(ev, where) {
-  ev.preventDefault();
-  where.style.opacity = '0.7';
-  where.style.filter = 'blur(1px)';
+function allowDrop(e, col) {
+  e.preventDefault();
+
+  col.setAttribute(
+    'style',
+    'min-height:100vh;opacity:0.7;filter:blur(1px)'
+  );
 }
 
-function dragLeave(ev, where) {
-  where.style.boxShadow = '';
- where.style.opacity = '1';
- where.style.filter = 'none';
+function dragLeave(e, col) {
+  col.setAttribute(
+    'style',
+    'opacity:1;filter:none;'
+  );
 }
 
-function drop(ev, where) {
-  ev.preventDefault();
-  const data = ev.dataTransfer.getData('text');
-  where.appendChild(document.getElementById(data));
-  where.style.opacity = '1';
-  where.style.boxShadow = '';
-  where.style.filter = 'none';
-  botsLeft.style.minHeight = '0px';
-  botsMiddle.style.minHeight = '0px';
-  botsRight.style.minHeight = '0px';
+function drop(e, col) {
+  e.preventDefault();
+  const data = e.dataTransfer.getData('text');
+  col.appendChild(document.getElementById(data));
+
+  col.setAttribute(
+    'style',
+    'opacity:1;filter:none;'
+  );
+
+  botsContainerColumns.forEach((c) => {
+    c.setAttribute(
+      'style',
+      'min-height:inherit;'
+    );
+  });
 }
 
 function mousedown(e) {
-  if (e.target.id === 'title') {
-    moving = true;
-  } else {
-    moving = false;
-  }
+  moving = e.target.id === 'title-header';
 }
 
 /**
@@ -118,6 +131,7 @@ function createHeader(bot) {
   const title = document.createElement('div');
 
   const text = document.createElement('h3');
+  text.id = 'title-header';
   text.className =
     'slds-section__title ' +
     'slds-p-horizontal_small ' +
@@ -139,8 +153,6 @@ function createHeader(bot) {
   }
 
   circle.className = 'slds-float_right';
-
-  text.id = "title";
 
   title.appendChild(text);
   text.appendChild(circle);
@@ -182,7 +194,7 @@ function createFooter(bot) {
  *
  * @param {Object} bot - Bot response with UI
  */
-function parseBot(bot, i) {
+function parseBot(bot, botIndex) {
   // Unzip bots
   const zip = new AdmZip(new Buffer(bot.ui.data));
   const zipEntries = zip.getEntries();
@@ -221,9 +233,9 @@ function parseBot(bot, i) {
     headerSection.appendChild(footerSection);
     botContainer.appendChild(headerSection);
 
-    if ((i+1) % 3 === 1) {
+    if ((botIndex+ONE) % THREE === ONE) {
       botsLeft.appendChild(botContainer);
-    } else if ((i+1) % 3 === 2) {
+    } else if ((botIndex+ONE) % THREE === TWO) {
       botsMiddle.appendChild(botContainer);
     } else {
       botsRight.appendChild(botContainer);
@@ -430,42 +442,19 @@ window.onload = () => {
   activeToggle.addEventListener('click', toggleConfirmationModal);
   activeToggle.addEventListener('refocus.events', handleEvents, false);
 
-  botsLeft.addEventListener('drop', (e) => {
-    drop(e, botsLeft);
-  });
+  botsContainerColumns.forEach((c) => {
+    c.addEventListener('drop', (e) => {
+      drop(e, c);
+    });
 
-  botsMiddle.addEventListener('drop', (e) => {
-    drop(e, botsMiddle);
-  });
+    c.addEventListener('dragover', (e) => {
+      allowDrop(e, c);
+    });
 
-  botsRight.addEventListener('drop', (e) => {
-    drop(e, botsRight);
+    c.addEventListener('dragleave', (e) => {
+      dragLeave(e, c);
+    });
   });
-
-  botsLeft.addEventListener('dragover', (e) => {
-    allowDrop(e, botsLeft);
-  });
-
-  botsMiddle.addEventListener('dragover', (e) => {
-    allowDrop(e, botsMiddle);
-  });
-
-  botsRight.addEventListener('dragover', (e) => {
-    allowDrop(e, botsRight);
-  });
-
-  botsLeft.addEventListener('dragleave', (e) => {
-    dragLeave(e, botsLeft);
-  });
-
-  botsMiddle.addEventListener('dragleave', (e) => {
-    dragLeave(e, botsMiddle);
-  });
-
-  botsRight.addEventListener('dragleave', (e) => {
-    dragLeave(e, botsRight);
-  });
-
 
   confirmButton.onclick = roomStateChanged;
   declineButton.onclick = closeConfirmationModal;
