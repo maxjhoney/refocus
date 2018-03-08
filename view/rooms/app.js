@@ -68,27 +68,18 @@ function drag(e) {
   e.dataTransfer.setData('text', e.target.id);
 
   botsContainerColumns.forEach((c) => {
-    c.setAttribute(
-      'style',
-      'min-height:100vh;'
-    );
+    console.log(c.id);
+    c.className = 'slds-col slds-large-size--1-of-3 col-dragging';
   });
 }
 
 function allowDrop(e, col) {
   e.preventDefault();
-
-  col.setAttribute(
-    'style',
-    'min-height:100vh;opacity:0.7;filter:blur(1px)'
-  );
+  col.className = 'slds-col slds-large-size--1-of-3 col-dragging col-droppable';
 }
 
 function dragLeave(e, col) {
-  col.setAttribute(
-    'style',
-    'opacity:1;filter:none;'
-  );
+  col.className = 'slds-col slds-large-size--1-of-3 col-dragging';
 }
 
 function drop(e, col) {
@@ -96,16 +87,8 @@ function drop(e, col) {
   const data = e.dataTransfer.getData('text');
   col.appendChild(document.getElementById(data));
 
-  col.setAttribute(
-    'style',
-    'opacity:1;filter:none;'
-  );
-
   botsContainerColumns.forEach((c) => {
-    c.setAttribute(
-      'style',
-      'min-height:inherit;'
-    );
+    c.className = 'slds-col slds-large-size--1-of-3';
   });
 }
 
