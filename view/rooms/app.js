@@ -21,6 +21,8 @@ const botsLeft = document.getElementById('botsLeftColumn');
 const botsMiddle = document.getElementById('botsMiddleColumn');
 const botsRight = document.getElementById('botsRightColumn');
 const botsContainerColumns = [botsLeft, botsMiddle, botsRight];
+let ghostBot;
+let dummyBot;
 const activeToggle = document.getElementById('activeToggle');
 const confirmButton = document.getElementById('confirm_button');
 const declineButton = document.getElementById('decline_button');
@@ -65,31 +67,38 @@ function drag(e) {
     return e.preventDefault();
   }
 
-  e.dataTransfer.setData('text', e.target.id);
-
   botsContainerColumns.forEach((c) => {
-    console.log(c.id);
     c.className = 'slds-col slds-large-size--1-of-3 col-dragging';
   });
+
+  return e.dataTransfer.setData('text', e.target.id);
 }
 
-function allowDrop(e, col) {
+function allowDrop(e, bot) {
+  console.log(e);
+  const col = bot.parentElement;
   e.preventDefault();
-  col.className = 'slds-col slds-large-size--1-of-3 col-dragging col-droppable';
+  col.insertBefore(ghostBot, bot);
 }
 
-function dragLeave(e, col) {
-  col.className = 'slds-col slds-large-size--1-of-3 col-dragging';
+function columnDragOver(e, column) {
+  column.appendChild(dummyBot);
+}
+
+function dragEnd() {
+  if (ghostBot.parentElement) {
+    ghostBot.parentElement.removeChild(ghostBot);
+  }
+
+  botsContainerColumns.forEach((c) => {
+    c.className = 'slds-col slds-large-size--1-of-3';
+  });
 }
 
 function drop(e, col) {
   e.preventDefault();
   const data = e.dataTransfer.getData('text');
-  col.appendChild(document.getElementById(data));
-
-  botsContainerColumns.forEach((c) => {
-    c.className = 'slds-col slds-large-size--1-of-3';
-  });
+  col.insertBefore(document.getElementById(data), ghostBot);
 }
 
 function mousedown(e) {
@@ -172,10 +181,42 @@ function createFooter(bot) {
   return footer;
 }
 
+function setupMovableBots(botContainer, botIndex) {
+  botContainer.setAttribute(
+    'draggable',
+    'true'
+  );
+
+  botContainer.addEventListener('dragstart', (e) => {
+    drag(e);
+  });
+
+  botContainer.addEventListener('dragend', () => {
+    dragEnd();
+  });
+
+  botContainer.addEventListener('dragover', (e) => {
+    allowDrop(e, botContainer);
+  });
+
+  botContainer.addEventListener('mousedown', (e) => {
+    mousedown(e);
+  });
+
+  if ((botIndex+ONE) % THREE === ONE) {
+    botsLeft.appendChild(botContainer);
+  } else if ((botIndex+ONE) % THREE === TWO) {
+    botsMiddle.appendChild(botContainer);
+  } else {
+    botsRight.appendChild(botContainer);
+  }
+}
+
 /**
  * Create DOM elements for each of the files in the bots zip.
  *
  * @param {Object} bot - Bot response with UI
+ * @param {Int} botIndex - Index of Bot
  */
 function parseBot(bot, botIndex) {
   // Unzip bots
@@ -187,21 +228,6 @@ function parseBot(bot, botIndex) {
   // Get the bots section of the page
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
-
-  botContainer.setAttribute(
-    'draggable',
-    'true'
-  );
-
-  botContainer.addEventListener('dragstart', (e) => {
-    drag(e);
-  });
-
-  botContainer.addEventListener('mousedown', (e) => {
-    mousedown(e);
-  });
-
-
   const contentSection = document.createElement('div');
   contentSection.className = 'slds-section__content';
   const headerSection = createHeader(bot);
@@ -215,14 +241,7 @@ function parseBot(bot, botIndex) {
     headerSection.appendChild(contentSection);
     headerSection.appendChild(footerSection);
     botContainer.appendChild(headerSection);
-
-    if ((botIndex+ONE) % THREE === ONE) {
-      botsLeft.appendChild(botContainer);
-    } else if ((botIndex+ONE) % THREE === TWO) {
-      botsMiddle.appendChild(botContainer);
-    } else {
-      botsRight.appendChild(botContainer);
-    }
+    setupMovableBots(botContainer, botIndex);
   }
 
   // go through zipEntries that arent 'index.html'
@@ -421,9 +440,14 @@ function handleEvents(event) {
   }
 }
 
-window.onload = () => {
-  activeToggle.addEventListener('click', toggleConfirmationModal);
-  activeToggle.addEventListener('refocus.events', handleEvents, false);
+function setupColumns() {
+  ghostBot = document.createElement('div');
+  dummyBot = document.createElement('div');
+  ghostBot.className = 'ghost-bot';
+  const ghostBotInside = document.createElement('div');
+  ghostBotInside.className = 'internal-ghost-bot';
+  ghostBot.appendChild(ghostBotInside);
+  dummyBot.className = 'dummy-bot';
 
   botsContainerColumns.forEach((c) => {
     c.addEventListener('drop', (e) => {
@@ -431,16 +455,26 @@ window.onload = () => {
     });
 
     c.addEventListener('dragover', (e) => {
-      allowDrop(e, c);
-    });
-
-    c.addEventListener('dragleave', (e) => {
-      dragLeave(e, c);
+      columnDragOver(e, c);
     });
   });
 
+  ghostBot.addEventListener('dragover', (e) => {
+    allowDrop(e, ghostBot);
+  });
+
+  dummyBot.addEventListener('dragover', (e) => {
+    allowDrop(e, dummyBot);
+  });
+}
+
+window.onload = () => {
+  activeToggle.addEventListener('click', toggleConfirmationModal);
+  activeToggle.addEventListener('refocus.events', handleEvents, false);
   confirmButton.onclick = roomStateChanged;
   declineButton.onclick = closeConfirmationModal;
+
+  setupColumns();
 
   // Note: this is declared in index.pug:
   _io = io;
