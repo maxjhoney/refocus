@@ -21,8 +21,6 @@ const botsLeft = document.getElementById('botsLeftColumn');
 const botsMiddle = document.getElementById('botsMiddleColumn');
 const botsRight = document.getElementById('botsRightColumn');
 const botsContainerColumns = [botsLeft, botsMiddle, botsRight];
-let ghostBot;
-let dummyBot;
 const activeToggle = document.getElementById('activeToggle');
 const confirmButton = document.getElementById('confirm_button');
 const declineButton = document.getElementById('decline_button');
@@ -43,10 +41,12 @@ let _io;
 let _user;
 let _roomName;
 let _isActive;
+let ghostBot;
+let dummyBot;
+let moving;
 let botInfo = {};
 const DEBUG_REALTIME = window.location.href.split(/[&\?]/)
   .includes('debug=REALTIME');
-let moving;
 
 /**
  * Creates headers for each bot added to the UI
@@ -62,30 +62,46 @@ function debugMessage(msg, obj){
   }
 }
 
-function drag(e) {
+/**
+ * Called when bot is clicked and dragged
+ *
+ * @param {Object} event - Dragging bot event.
+ */
+function botDragHandler(event) {
   if (botsLeft.offsetWidth === botsContainer.offsetWidth || !moving) {
-    return e.preventDefault();
+    event.preventDefault();
+  } else {
+    botsContainerColumns.forEach((c) => {
+      c.className = 'slds-col slds-large-size--1-of-3 col-dragging';
+    });
+
+    event.dataTransfer.setData('text', event.target.id);
   }
-
-  botsContainerColumns.forEach((c) => {
-    c.className = 'slds-col slds-large-size--1-of-3 col-dragging';
-  });
-
-  return e.dataTransfer.setData('text', e.target.id);
 }
 
-function allowDrop(e, bot) {
-  console.log(e);
+/**
+ * Called when bot is able to be dropped
+ *
+ * @param {Object} event - Dragging bot event.
+ * @param {DOM} bot - Bot container.
+ */
+function allowBotDropHandler(event, bot) {
   const col = bot.parentElement;
-  e.preventDefault();
+  event.preventDefault();
   col.insertBefore(ghostBot, bot);
 }
 
-function columnDragOver(e, column) {
+/**
+ * Called when bot is being dragged over a column where it can be dropped.
+ *
+ * @param {DOM} column - Column that bot is being dragged over.
+ */
+function dragOverColumnHandler(column) {
   column.appendChild(dummyBot);
 }
 
-function dragEnd() {
+// Called when a bot stops being dragged.
+function botDragEndHandler() {
   if (ghostBot.parentElement) {
     ghostBot.parentElement.removeChild(ghostBot);
   }
@@ -95,14 +111,16 @@ function dragEnd() {
   });
 }
 
-function drop(e, col) {
-  e.preventDefault();
-  const data = e.dataTransfer.getData('text');
+/**
+ * Called when bot is dropped in a valid column.
+ *
+ * @param {Object} event - Dropping bot event.
+ * @param {DOM} col - Column that bot is being dragged over.
+ */
+function drop(event, col) {
+  event.preventDefault();
+  const data = event.dataTransfer.getData('text');
   col.insertBefore(document.getElementById(data), ghostBot);
-}
-
-function mousedown(e) {
-  moving = e.target.id === 'title-header';
 }
 
 /**
@@ -181,6 +199,12 @@ function createFooter(bot) {
   return footer;
 }
 
+/**
+ * Sets up the bots to be movable between columns.
+ *
+ * @param {DOM} botContainer - Container of bot
+ * @param {Int} botIndex - Index of the bot
+ */
 function setupMovableBots(botContainer, botIndex) {
   botContainer.setAttribute(
     'draggable',
@@ -188,21 +212,23 @@ function setupMovableBots(botContainer, botIndex) {
   );
 
   botContainer.addEventListener('dragstart', (e) => {
-    drag(e);
+    botDragHandler(e);
   });
 
   botContainer.addEventListener('dragend', () => {
-    dragEnd();
+    botDragEndHandler();
   });
 
   botContainer.addEventListener('dragover', (e) => {
-    allowDrop(e, botContainer);
+    allowBotDropHandler(e, botContainer);
   });
 
+  // Only need to move the bot if the header is clicked
   botContainer.addEventListener('mousedown', (e) => {
-    mousedown(e);
+    moving = e.target.id === 'title-header';
   });
 
+  // Adding bot to correct initial column
   if ((botIndex+ONE) % THREE === ONE) {
     botsLeft.appendChild(botContainer);
   } else if ((botIndex+ONE) % THREE === TWO) {
@@ -440,6 +466,7 @@ function handleEvents(event) {
   }
 }
 
+// Setting up columns so bots can be moved between them.
 function setupColumns() {
   ghostBot = document.createElement('div');
   dummyBot = document.createElement('div');
@@ -454,17 +481,17 @@ function setupColumns() {
       drop(e, c);
     });
 
-    c.addEventListener('dragover', (e) => {
-      columnDragOver(e, c);
+    c.addEventListener('dragover', () => {
+      dragOverColumnHandler(c);
     });
   });
 
   ghostBot.addEventListener('dragover', (e) => {
-    allowDrop(e, ghostBot);
+    allowBotDropHandler(e, ghostBot);
   });
 
   dummyBot.addEventListener('dragover', (e) => {
-    allowDrop(e, dummyBot);
+    allowBotDropHandler(e, dummyBot);
   });
 }
 
@@ -473,7 +500,6 @@ window.onload = () => {
   activeToggle.addEventListener('refocus.events', handleEvents, false);
   confirmButton.onclick = roomStateChanged;
   declineButton.onclick = closeConfirmationModal;
-
   setupColumns();
 
   // Note: this is declared in index.pug:
