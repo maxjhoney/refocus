@@ -40,6 +40,7 @@ const GITHUB_LOGO = '../static/images/GitHub-Mark.png';
 let _io;
 let _user;
 let _roomName;
+let _isActive
 let ghostBot;
 let dummyBot;
 let moving;
