@@ -37,6 +37,7 @@ const GET_ROOM = '/v1/rooms/' + ROOM_ID;
 const GET_EVENTS = '/v1/events';
 const GET_ROOMTYPES = '/v1/roomTypes';
 const GITHUB_LOGO = '../static/images/GitHub-Mark.png';
+const BOT_LOGO = '../static/images/aaa.png';
 let _io;
 let _user;
 let _roomName;
@@ -470,9 +471,13 @@ function handleEvents(event) {
 function setupColumns() {
   ghostBot = document.createElement('div');
   dummyBot = document.createElement('div');
+  const img = document.createElement('img');
+  img.className = 'bot-img';
+  img.src = BOT_LOGO;
   ghostBot.className = 'ghost-bot';
   const ghostBotInside = document.createElement('div');
   ghostBotInside.className = 'internal-ghost-bot';
+  ghostBotInside.appendChild(img);
   ghostBot.appendChild(ghostBotInside);
   dummyBot.className = 'dummy-bot';
 

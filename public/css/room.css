@@ -9,10 +9,18 @@
 .internal-ghost-bot {
   border: 5px dashed #006fd2;
   height: 100%;
+  text-align: center;
+  vertical-align: center;
 }
 
 .col-dragging {
   min-height: 100vh;
+}
+
+.bot-img {
+  margin-top: 25px;
+  height: 100px;
+  width: 100px;
 }
 
 @media (min-width: 64em) {
