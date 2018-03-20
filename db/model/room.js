@@ -91,6 +91,13 @@ module.exports = function room(seq, dataTypes) {
           through: 'RoomWriters',
           foreignKey: 'roomId',
         });
+        Room.addScope('defaultScope', {
+          order: [
+            ['id', 'DESC'],
+          ],
+        }, {
+          override: true
+        });
       },
     },
     hooks: {
