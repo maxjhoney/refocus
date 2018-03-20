@@ -135,14 +135,14 @@ function cleanAddAspectToSample(sampleObj, aspectObj) {
   let sampleRes = {};
   sampleRes = sampleStore.arrayObjsStringsToJson(sampleObj,
     constants.fieldsToStringify.sample);
-  const aspect = sampleStore.arrayObjsStringsToJson(aspectObj,
-    constants.fieldsToStringify.aspect);
-  if (aspect) {
+  if (aspectObj) {
+    const aspect = sampleStore.arrayObjsStringsToJson(aspectObj,
+      constants.fieldsToStringify.aspect);
     modelUtils.cleanQueryBodyObj(aspect, embeddedAspectFields);
     sampleStore.convertAspectStrings(aspect);
+    sampleRes.aspect = aspect;
   }
 
-  sampleRes.aspect = aspect;
   return sampleRes;
 } // cleanAddAspectToSample
 
