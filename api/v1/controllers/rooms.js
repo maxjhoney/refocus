@@ -11,6 +11,7 @@
  */
 'use strict';
 
+const config = require('../../../config.js');
 const helper = require('../helpers/nouns/rooms');
 const doDelete = require('../helpers/verbs/doDelete');
 const doFind = require('../helpers/verbs/doFind');
@@ -18,6 +19,7 @@ const doGet = require('../helpers/verbs/doGet');
 const doPatch = require('../helpers/verbs/doPatch');
 const doPost = require('../helpers/verbs/doPost');
 const doPut = require('../helpers/verbs/doPut');
+const DEFAULT_LIMIT = config.botEventLimit;
 
 module.exports = {
 
@@ -44,6 +46,10 @@ module.exports = {
    * @param {Function} next - The next middleware function in the stack
    */
   findRooms(req, res, next) {
+    if (!req.swagger.params.limit.value) {
+      req.swagger.params.limit.value = DEFAULT_LIMIT;
+    }
+
     doFind(req, res, next, helper);
   },
 

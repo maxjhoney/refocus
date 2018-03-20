@@ -30,6 +30,7 @@ window.onload = () => {
   uPage.setRoomsTab();
   u.getPromiseWithUrl(GET_ROOMS)
   .then((res) => {
+    console.log(res)
     rooms = res.body;
     return u.getPromiseWithUrl(GET_ROOMTYPES);
   })
