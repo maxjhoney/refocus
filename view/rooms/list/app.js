@@ -21,7 +21,7 @@ import moment from 'moment';
 const u = require('../../utils');
 const uPage = require('./../utils/page');
 const roomsListContainer = document.getElementById('roomsListContainer');
-const GET_ROOMS = '/v1/rooms';
+const GET_ROOMS = '/v1/rooms?active=true';
 const GET_ROOMTYPES = '/v1/roomTypes';
 
 window.onload = () => {
