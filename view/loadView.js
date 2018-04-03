@@ -94,6 +94,7 @@ function samlAuthentication(userProfile, done) {
           profileId: profile.id,
           name: userProfile.email,
           password: viewConfig.dummySsoPassword,
+          fullName: `${userProfile.firstname} ${userProfile.lastname}`,
           sso: true,
         });
       })
