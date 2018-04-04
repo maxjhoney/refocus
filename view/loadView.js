@@ -93,7 +93,7 @@ function samlAuthentication(userProfile, done) {
           profileId: profile.id,
           name: userProfile.email,
           password: viewConfig.dummySsoPassword,
-          fullName: `${userProfile.firstName} ${userProfile.lastName}`,
+          fullName: `${userProfile.FirstName} ${userProfile.LastName}`,
           sso: true,
         });
       })
@@ -108,7 +108,7 @@ function samlAuthentication(userProfile, done) {
       });
     }
 
-    const userFullName = `${userProfile.firstName} ${userProfile.lastName}`;
+    const userFullName = `${userProfile.FirstName} ${userProfile.LastName}`;
 
     if (user.fullName !== userFullName) {
       user.updateAttributes({
