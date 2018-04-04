@@ -72,6 +72,7 @@ function ensureAuthenticated(req, res, next) {
  * @param  {Function} done - Callback function
  */
 function samlAuthentication(userProfile, done) {
+  const userFullName = `${userProfile.firstname} ${userProfile.lastname}`;
   User.findOne({ where: { email: userProfile.email } })
   .then((user) => {
     if (!user) {
@@ -93,7 +94,7 @@ function samlAuthentication(userProfile, done) {
           profileId: profile.id,
           name: userProfile.email,
           password: viewConfig.dummySsoPassword,
-          fullName: `${userProfile.firstname} ${userProfile.lastname}`,
+          fullName: userFullName,
           sso: true,
         });
       })
@@ -108,9 +109,7 @@ function samlAuthentication(userProfile, done) {
       });
     }
 
-    const userFullName = `${userProfile.firstname} ${userProfile.lastname}`;
-
-    if (user.fullName !== userFullName) {
+    if (!user.fullName) {
       user.updateAttributes({
         fullName: userFullName,
       });
