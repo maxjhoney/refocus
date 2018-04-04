@@ -85,6 +85,7 @@ function samlAuthentication(userProfile, done) {
         return Profile.create({ name: 'RefocusSSOUser' });
       })
       .then((profile) => {
+
         /**
          * default scope not applied on create, so we use User.find after this to
          * get profile attached to user.
@@ -94,7 +95,7 @@ function samlAuthentication(userProfile, done) {
           profileId: profile.id,
           name: userProfile.email,
           password: viewConfig.dummySsoPassword,
-          fullName: userFullName,
+          //fullName: userFullName,
           sso: true,
         });
       })
@@ -109,14 +110,18 @@ function samlAuthentication(userProfile, done) {
       });
     }
 
-    if (!user.fullName) {
-      user.updateAttributes({
-        fullName: userFullName,
-      });
+    if (user.fullName) {
+      console.log("already there")
+      // profile already attached - default scope applied on find
+      return done(null, user);
     }
 
-    // profile already attached - default scope applied on find
-    return done(null, user);
+    user.update({
+      fullName: userFullName,
+    }).then(() => {
+      console.log("finished updading")
+      return done(null, user);
+    });
   })
   .catch((error) => {
     done(error);
