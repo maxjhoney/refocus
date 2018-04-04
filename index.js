@@ -63,6 +63,14 @@ function start(clusterProcessId = 0) { // eslint-disable-line max-statements
   const express = require('express');
   const enforcesSSL = require('express-enforces-ssl');
 
+  var options = {
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt'),
+    requestCert: false,
+    rejectUnauthorized: false
+  };
+
+
   const app = express();
 
   /*
@@ -71,7 +79,7 @@ function start(clusterProcessId = 0) { // eslint-disable-line max-statements
    */
   app.use(compress());
 
-  const httpServer = require('http').Server(app);
+  const httpServer = require('https').createServer(options, app);
   const io = require('socket.io')(httpServer);
   const socketIOSetup = require('./realtime/setupSocketIO');
 
@@ -104,7 +112,7 @@ function start(clusterProcessId = 0) { // eslint-disable-line max-statements
    * attempt to do a redirect 301 to https. Reject all other requests (DELETE,
    * PATCH, POST, PUT, etc.) with a 403.
    */
-  if (featureToggles.isFeatureEnabled('requireHttps')) {
+  if (true) {
     app.enable('trust proxy');
     app.use(enforcesSSL());
   }

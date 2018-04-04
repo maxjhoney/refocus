@@ -72,6 +72,7 @@ function ensureAuthenticated(req, res, next) {
  * @param  {Function} done - Callback function
  */
 function samlAuthentication(userProfile, done) {
+  console.log(userProfile);
   User.findOne({ where: { email: userProfile.email } })
   .then((user) => {
     if (!user) {
