@@ -251,6 +251,8 @@ function setupMovableBots(botContainer, botName, botIndex) {
 function createHeader(bot) {
   const section = document.createElement('div');
   section.className = 'slds-section slds-is-open';
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!')
+  console.log(bot)
 
   section.setAttribute(
     'style',
@@ -296,27 +298,34 @@ function createHeader(bot) {
  * @param {Object} bot - Bot response with UI
  * @returns {DOM} footer - Footer section
  */
-function createFooter(bot) {
-  const footer = document.createElement('h3');
-  const linkedElement = document.createElement('a');
-  const gitHubImage = document.createElement('img');
+// function createFooter(bot) {
+//   const footer = document.createElement('h3');
+//   const linkedElement = document.createElement('a');
+//   const gitHubImage = document.createElement('img');
+//   const botVersion = document.createElement('span');
+//   console.log('******************************')
+//   console.log(bot)
 
-  footer.className =
-    'slds-section__title ' +
-    'slds-p-horizontal_small ' +
-    'slds-theme_shade ';
+//   footer.className =
+//     'slds-section__title ' +
+//     'slds-p-horizontal_small ' +
+//     'slds-theme_shade ';
 
-  linkedElement.href = bot.url;
-  linkedElement.target = '_blank';
-  linkedElement.rel = 'noopener noreferrer';
-  gitHubImage.height = '20';
-  gitHubImage.width = '20';
-  gitHubImage.src = GITHUB_LOGO;
-  linkedElement.appendChild(gitHubImage);
-  footer.appendChild(linkedElement);
+//   botVersion.innerHTML = bot.version;
+//   botVersion.className = 'slds-p-horizontal_small'+
+//     'slds-float_right';
+//   linkedElement.href = bot.url;
+//   linkedElement.target = '_blank';
+//   linkedElement.rel = 'noopener noreferrer';
+//   gitHubImage.height = '20';
+//   gitHubImage.width = '20';
+//   gitHubImage.src = GITHUB_LOGO;
+//   linkedElement.appendChild(gitHubImage);
+//   //footer.appendChild(linkedElement);
+//   footer.appendChild(botVersion);
 
-  return footer;
-}
+//   return footer;
+// }
 
 /**
  * Dispatches javascript events to bots in iFrames
@@ -431,7 +440,7 @@ function displayBot(bot, botIndex) {
   const botContainer = document.createElement('div');
   botContainer.id = bot.name + '-section';
   const headerSection = createHeader(bot);
-  const footerSection = createFooter(bot);
+  // const footerSection = createFooter(bot);
 
   const iframe = document.createElement('iframe');
   iframe.id = bot.name + '-iframe-section';
@@ -441,7 +450,7 @@ function displayBot(bot, botIndex) {
   iframe.frameBorder = 0;
 
   headerSection.appendChild(iframe);
-  headerSection.appendChild(footerSection);
+  // headerSection.appendChild(footerSection);
   botContainer.appendChild(headerSection);
   setupMovableBots(botContainer, bot.name, botIndex);
   const parsedBot = parseBot(bot);
