@@ -165,6 +165,7 @@ function start(clusterProcessId = 0) { // eslint-disable-line max-statements
     app.use((req, res, next) => {
       req.timestamp = Date.now();
       req.clusterProcessId = clusterProcessId;
+      console.log(req.headers);
       next();
     });
 
