@@ -50,8 +50,14 @@ module.exports = function botData(seq, dataTypes) {
     },
     value: {
       type: dataTypes.TEXT,
-      comment: 'Current value for bot data',
+      comment: 'Current value for bot data (depreciated)',
     },
+    jsonValue: {
+      type: dataTypes.JSON,
+      allowNull: true,
+      comment:
+        'Current value for bot data in JSON',
+    }
   }, {
     classMethods: {
       getBotDataAssociations() {
