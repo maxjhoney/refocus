@@ -97,6 +97,24 @@ describe('tests/api/v1/botData/patch.js >', () => {
     });
   });
 
+  it('Pass, patch botData jsonValue', (done) => {
+    const values = {
+      newField: 'newValue'
+    };
+    api.patch(`${path}/${saveBotData.id}`)
+    .set('Authorization', token)
+    .send({ jsonValue: values })
+    .expect(constants.httpStatus.OK)
+    .end((err, res) => {
+      if (err) {
+        return done(err);
+      }
+
+      expect(res.body.jsonValue).to.equal(values);
+      done();
+    });
+  });
+
   it('Fail, patch botData invalid name', (done) => {
     const newName = '~!invalidName';
     api.patch(`${path}/${saveBotData.id}`)

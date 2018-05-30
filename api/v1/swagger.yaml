@@ -1766,6 +1766,9 @@ paths:
               value:
                 type: string
                 description: Value of the bot data
+              jsonValue:
+                type: object
+                description: JSON value of the bot data
               botId:
                 type: string
                 maxLength: 254
@@ -1777,6 +1780,7 @@ paths:
             required:
               - name
               - value
+              - jsonValue
               - roomId
               - botId
       responses:
@@ -11866,6 +11870,9 @@ definitions:
       value:
         type: string
         description: Current value of the bot data
+      jsonValue:
+        type: object
+        description: Current jsonValue of the bot data
       roomId:
         type: integer
         description: The room number of the room of the bot data

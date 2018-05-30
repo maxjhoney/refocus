@@ -11,6 +11,7 @@
  */
 'use strict';
 const supertest = require('supertest');
+const _ = require('lodash');
 const api = supertest(require('../../../../index').app);
 const constants = require('../../../../api/v1/constants');
 const path = '/v1/botData';
@@ -97,6 +98,21 @@ describe('tests/api/v1/botData/post.js >', () => {
     });
   });
 
+  it('Pass, post botData contains jsonValue', (done) => {
+    api.post(`${path}`)
+    .set('Authorization', token)
+    .send(testBotData)
+    .expect(constants.httpStatus.CREATED)
+    .end((err, res) => {
+      if (err) {
+        return done(err);
+      }
+
+      expect(_.isEqual(res.body.jsonValue, testBotData.jsonValue));
+      done();
+    });
+  });
+
   it('Fail, duplicate botData', (done) => {
     BotData.create(testBotData)
     .then(() => {
@@ -118,10 +134,29 @@ describe('tests/api/v1/botData/post.js >', () => {
   });
 
   it('Fail, botData with invalid name', (done) => {
-    testBotData.name = '~!invalidName';
+    const invalidNameBotData = testBotData;
+    invalidNameBotData.name = '~!invalidName';
     api.post(`${path}`)
     .set('Authorization', token)
-    .send(testBotData)
+    .send(invalidNameBotData)
+    .expect(constants.httpStatus.BAD_REQUEST)
+    .end((err, res) => {
+      if (err) {
+        return done(err);
+      }
+
+      expect(res.body.errors[ZERO].type)
+      .to.contain(tu.schemaValidationErrorName);
+      done();
+    });
+  });
+
+  it('Fail, jsonValue is not valid JSON', (done) => {
+    const invalidJsonValueBotData = testBotData;
+    invalidJsonValueBotData.jsonValue = 'String';
+    api.post(`${path}`)
+    .set('Authorization', token)
+    .send(invalidJsonValueBotData)
     .expect(constants.httpStatus.BAD_REQUEST)
     .end((err, res) => {
       if (err) {

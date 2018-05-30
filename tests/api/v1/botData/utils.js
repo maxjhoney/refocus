@@ -18,6 +18,9 @@ const n = `${tu.namePrefix}TestBotData`;
 const standard = {
   name: n,
   value: 'String1',
+  jsonValue: {
+    fieldName: 'fieldValue'
+  }
 };
 
 module.exports = {
