@@ -19,6 +19,7 @@ const subjectType = redisStore.constants.objectType.subject;
 const subAspMapType = redisStore.constants.objectType.subAspMap;
 const aspectType = redisStore.constants.objectType.aspect;
 const sampleType = redisStore.constants.objectType.sample;
+const aspSubMapType = redisStore.constants.objectType.aspSubMap;
 
 /**
  * Capitalize the first letter of the string and returns the modified string.
@@ -258,6 +259,20 @@ function renameKey(type, oldName, newName) {
         .catch((err) => Promise.reject(err));
 } // renameKey
 
+/**
+ * Command to delete subject from aspect resource mapping
+ * @param  {String} aspName - Aspect name
+ * @param  {String} subjAbsPath - Subject absolute path
+ * @returns {Array} - Command array
+ */
+function delSubFromAspSetCmd(aspName, subjAbsPath) {
+  return [
+    'srem',
+    redisStore.toKey(aspSubMapType, aspName),
+    subjAbsPath.toLowerCase(),
+  ];
+}
+
 module.exports = {
 
   /**
@@ -445,6 +460,20 @@ module.exports = {
     });
   },
 
+  /**
+   * Command to add subject absolute path to aspect-to-subject resource mapping
+   * @param  {String} aspName - Aspect name
+   * @param  {String} subjAbsPath - Subject absolute path
+   * @returns {Array} - Command array
+   */
+  addSubjectAbsPathInAspectSetCmd(aspName, subjAbsPath) {
+    return [
+      'sadd',
+      redisStore.toKey(aspSubMapType, aspName),
+      subjAbsPath.toLowerCase(),
+    ];
+  },
+
   renameKey,
 
   deleteKey,
@@ -470,4 +499,6 @@ module.exports = {
   getValue,
 
   getHashPromise,
+
+  delSubFromAspSetCmd,
 }; // export
