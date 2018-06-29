@@ -155,9 +155,10 @@ function findNamePrefixFromAbsolutePath(options, searchText, callback) {
 function getConfig(values, key, value) {
   const ZERO = 0;
   const convertedText = convertCamelCase(key);
+  const options = arrayFilter(values[key] || [], value);
   let config = {
     title: key,
-    options: [],
+    options,
   };
 
   if (key === 'subjects') {
@@ -183,7 +184,7 @@ function getConfig(values, key, value) {
     if (key === 'statusFilter') {
       config.allOptionsLabel = 'All ' +
         convertedText.replace(' Filter', '') + 'es';
-      config.options = arrayFilter(values[key] || [], value);
+      // config.options = arrayFilter(values[key] || [], value);
     } else if (key === 'aspectFilter') {
       config.allOptionsLabel = 'All ' +
         convertedText.replace(' Filter', '') + 's';
@@ -193,7 +194,7 @@ function getConfig(values, key, value) {
 
     delete config.placeholderText;
   } else {
-    config.options = arrayFilter(values[key] || [], value);
+    // config.options = arrayFilter(values[key] || [], value);
   }
 
   return config;
