@@ -152,6 +152,7 @@ class CreatePerspective extends React.Component {
       let value = this.state[key];
 
       //  if perspective passed in, may amend value based on key
+      console.log(values, key, value)
       let config = getConfig(values, key, value);
 
       // if this dropdown is multi-pill, move the dropdown menu lower

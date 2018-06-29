@@ -146,7 +146,15 @@ function arrayFilter(array1, exclude = []) {
     exclude = [exclude];
   }
   const excludeSet = new Set(exclude);
-  return array1.filter((item) => !excludeSet.has(item));
+  let retval = []
+  for (let i = 0; i < array1.length; i++) {
+    if (!excludeSet.has(item)) {
+      retval.push(array1[i])
+    }
+  }
+  // let retval = array1.filter((item) => !excludeSet.has(item));
+  console.log('retval: ', retval)
+  console.log(array1)
 }
 
 function findNamePrefixFromAbsolutePath(options, searchText, callback) {
