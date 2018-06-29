@@ -117,19 +117,19 @@ function getTagsFromResources(array) {
   });
 }
 
-/**
- * Given array of objects, returns array without
- * the input elements
- *
- * @param {Array} arr The array to filter from
- * @param {String} removeThis The elem to remove from array.
- * Multiple elements may be removed
- * get new array from
- * @returns {Array} The array of strings or primitives
- */
-function filteredArray(arr, removeThis) {
-  return arr.filter((elem) => elem && elem !== removeThis);
-}
+// /**
+//  * Given array of objects, returns array without
+//  * the input elements
+//  *
+//  * @param {Array} arr The array to filter from
+//  * @param {String} removeThis The elem to remove from array.
+//  * Multiple elements may be removed
+//  * get new array from
+//  * @returns {Array} The array of strings or primitives
+//  */
+// function filteredArray(arr, removeThis) {
+//   return arr.filter((elem) => elem && elem !== removeThis);
+// }
 
 
 /**
@@ -146,15 +146,17 @@ function arrayFilter(array1, exclude = []) {
     exclude = [exclude];
   }
   const excludeSet = new Set(exclude);
-  let retval = []
-  for (let i = 0; i < array1.length; i++) {
-    if (!excludeSet.has(item)) {
-      retval.push(array1[i])
-    }
-  }
-  // let retval = array1.filter((item) => !excludeSet.has(item));
+  // let retval = []
+  // for (let i = 0; i < array1.length; i++) {
+  //   if (!excludeSet.has(array1[i])) {
+  //     retval.push(array1[i])
+  //   }
+  // }
+  let retval = array1.filter((item) => !excludeSet.has(item));
   console.log('retval: ', retval)
-  console.log(array1)
+  console.log('array: ', array1)
+  console.log('exclude: ', exclude)
+  return retval
 }
 
 function findNamePrefixFromAbsolutePath(options, searchText, callback) {
@@ -178,16 +180,16 @@ function findNamePrefixFromAbsolutePath(options, searchText, callback) {
 function getConfig(values, key, value) {
   const ZERO = 0;
   const convertedText = convertCamelCase(key);
-  const options = arrayFilter(values[key] || [], value);
+  // const options = arrayFilter(values[key] || [], value);
   let config = {
     title: key,
-    options,
+    options: [],
   };
 
   if (key === 'subjects') {
     config.placeholderText = 'Enter a subject name';
     let options = getArray('absolutePath', values[key]);
-    config.options = filteredArray(options, value);
+    config.options = arrayFilter(options, value);
     config.isArray = false;
     config.notOpenOnFocus = true;
 
@@ -196,7 +198,7 @@ function getConfig(values, key, value) {
   } else if (key === 'lenses') {
     config.placeholderText = 'Select a Lens...';
     let options = getArray('name', values[key]);
-    config.options = filteredArray(options, value);
+    config.options = arrayFilter(options, value);
     config.isArray = false;
   } else if (key.slice(-6) === 'Filter') {
     // if key ends with Filter
@@ -207,17 +209,15 @@ function getConfig(values, key, value) {
     if (key === 'statusFilter') {
       config.allOptionsLabel = 'All ' +
         convertedText.replace(' Filter', '') + 'es';
-      // config.options = arrayFilter(values[key] || [], value);
+      config.options = arrayFilter(values[key] || [], value);
     } else if (key === 'aspectFilter') {
       config.allOptionsLabel = 'All ' +
         convertedText.replace(' Filter', '') + 's';
       let options = getArray('name', values[key]);
-      config.options = filteredArray(values[key], value);
+      config.options = arrayFilter(values[key], value);
     }
 
     delete config.placeholderText;
-  } else {
-    // config.options = arrayFilter(values[key] || [], value);
   }
 
   return config;
@@ -452,7 +452,7 @@ module.exports =  {
   getTagsFromArrays,
   getFilterQuery,
   arrayFilter, // for testing
-  filteredArray,
+  // filteredArray,
   getConfig,
   getArray,
   getTagsFromResources,
