@@ -117,21 +117,6 @@ function getTagsFromResources(array) {
   });
 }
 
-// /**
-//  * Given array of objects, returns array without
-//  * the input elements
-//  *
-//  * @param {Array} arr The array to filter from
-//  * @param {String} removeThis The elem to remove from array.
-//  * Multiple elements may be removed
-//  * get new array from
-//  * @returns {Array} The array of strings or primitives
-//  */
-// function filteredArray(arr, removeThis) {
-//   return arr.filter((elem) => elem && elem !== removeThis);
-// }
-
-
 /**
  * Return all items from array1 that are not in array2
  *
@@ -146,17 +131,7 @@ function arrayFilter(array1, exclude = []) {
     exclude = [exclude];
   }
   const excludeSet = new Set(exclude);
-  // let retval = []
-  // for (let i = 0; i < array1.length; i++) {
-  //   if (!excludeSet.has(array1[i])) {
-  //     retval.push(array1[i])
-  //   }
-  // }
-  let retval = array1.filter((item) => !excludeSet.has(item));
-  console.log('retval: ', retval)
-  console.log('array: ', array1)
-  console.log('exclude: ', exclude)
-  return retval
+  return array1.filter((item) => !excludeSet.has(item));
 }
 
 function findNamePrefixFromAbsolutePath(options, searchText, callback) {
@@ -180,7 +155,6 @@ function findNamePrefixFromAbsolutePath(options, searchText, callback) {
 function getConfig(values, key, value) {
   const ZERO = 0;
   const convertedText = convertCamelCase(key);
-  // const options = arrayFilter(values[key] || [], value);
   let config = {
     title: key,
     options: [],
@@ -451,8 +425,7 @@ module.exports =  {
   getValuesObject,
   getTagsFromArrays,
   getFilterQuery,
-  arrayFilter, // for testing
-  // filteredArray,
+  arrayFilter,
   getConfig,
   getArray,
   getTagsFromResources,

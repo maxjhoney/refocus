@@ -148,12 +148,10 @@ class CreatePerspective extends React.Component {
     const { dropdownConfig } = this.state;
     const { values, BLOCK_SIZE } = this.props;
     let stateObject = getStateDataOnly(this.state);
-    console.log('values: ', values)
     for (let key in stateObject) {
       let value = this.state[key];
 
       //  if perspective passed in, may amend value based on key
-      console.log('key: ', key, 'value: ', value)
       let config = getConfig(values, key, value);
 
       // if this dropdown is multi-pill, move the dropdown menu lower
