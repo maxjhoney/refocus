@@ -118,6 +118,21 @@ function getTagsFromResources(array) {
 }
 
 /**
+ * Given array of objects, returns array without
+ * the input elements
+ *
+ * @param {Array} arr The array to filter from
+ * @param {String} removeThis The elem to remove from array.
+ * Multiple elements may be removed
+ * get new array from
+ * @returns {Array} The array of strings or primitives
+ */
+function filteredArray(arr, removeThis) {
+  return arr.filter((elem) => elem && elem !== removeThis);
+}
+
+
+/**
  * Return all items from array1 that are not in array2
  *
  * @param {Array} array1 Array to filter
@@ -164,7 +179,7 @@ function getConfig(values, key, value) {
   if (key === 'subjects') {
     config.placeholderText = 'Enter a subject name';
     let options = getArray('absolutePath', values[key]);
-    config.options = arrayFilter(options, value);
+    config.options = filteredArray(options, value);
     config.isArray = false;
     config.notOpenOnFocus = true;
 
@@ -173,7 +188,7 @@ function getConfig(values, key, value) {
   } else if (key === 'lenses') {
     config.placeholderText = 'Select a Lens...';
     let options = getArray('name', values[key]);
-    config.options = arrayFilter(options, value);
+    config.options = filteredArray(options, value);
     config.isArray = false;
   } else if (key.slice(-6) === 'Filter') {
     // if key ends with Filter
@@ -189,7 +204,7 @@ function getConfig(values, key, value) {
       config.allOptionsLabel = 'All ' +
         convertedText.replace(' Filter', '') + 's';
       let options = getArray('name', values[key]);
-      config.options = arrayFilter(values[key], value);
+      config.options = filteredArray(values[key], value);
     }
 
     delete config.placeholderText;
@@ -429,6 +444,7 @@ module.exports =  {
   getTagsFromArrays,
   getFilterQuery,
   arrayFilter, // for testing
+  filteredArray,
   getConfig,
   getArray,
   getTagsFromResources,
