@@ -59,20 +59,25 @@ describe('tests/api/v1/collectors/start.js >', () => {
       const gen1 = sgUtils.getGenerator();
       gen1.name += 'generator-1';
       gen1.createdBy = user.id;
-      gen1.currentCollector = u.getCollectorToCreate().name;
+      gen1.currentCollector = u.getCollectorToCreate();
 
       const gen2 = sgUtils.getGenerator();
       gen2.name += 'generator-2';
       gen2.createdBy = user.id;
-      gen2.currentCollector = u.getCollectorToCreate().name;
+      gen2.currentCollector = u.getCollectorToCreate();
+      // console.log(gen2)
       return Generator.bulkCreate([gen1, gen2]);
     })
     .then((generators) => {
+      // console.log(generators)
       generator1 = generators[0];
       generator2 = generators[1];
       return Collector.create(u.getCollectorToCreate());
     })
-    .then((c) => c.addCurrentGenerators([generator1, generator2]))
+    .then((c) => {
+      // console.log(c)
+      c.addCurrentGenerators([generator1, generator2])
+    })
     .then(() => done())
     .catch((err) => {
       console.error(err);
@@ -84,17 +89,18 @@ describe('tests/api/v1/collectors/start.js >', () => {
   after(tu.forceDeleteUser);
 
   describe('if the collector is registered and status is STOPPED >', () => {
-    it('if the user is among the writers, start the collector ' +
+    it.only('if the user is among the writers, start the collector ' +
       'and return the expected response', (done) => {
       api.post(path)
       .set('Authorization', token)
       .send(defaultCollector)
-      .expect(constants.httpStatus.OK)
+      // .expect(constants.httpStatus.OK)
       .end((err, res) => {
         if (err) {
           return done(err);
         }
 
+        console.log(res.body)
         expect(res.body.status).to.equal('Running');
         expect(res.body.token).to.be.an('string');
         expect(res.body.collectorConfig).to.include(collectorConfig);

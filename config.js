@@ -191,7 +191,7 @@ module.exports = {
        '7265666f637573726f636b7377697468677265656e6f776c7373616e6672616e',
     },
     development: {
-      dbLogging: false, // console.log | false | ...
+      dbLogging: console.log, // console.log | false | ...
       dbUrl: defaultDbUrl,
       defaultNodePort: defaultPort,
       host: '127.0.0.1',
