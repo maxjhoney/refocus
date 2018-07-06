@@ -66,7 +66,13 @@ function setupNamespace(io) {
         objArr.forEach((o) => rtUtils.initializePerspectiveNamespace(o, io));
       }
     })
-    .then(() => room.findAll()
+    .then(() => room.find(
+        {
+          where: {
+            active: active,
+          }
+        }
+      )
       .then((rooms) => {
         if (rooms) {
           rooms.forEach((r) => rtUtils.initializeBotNamespace(r.toJSON(), io));
