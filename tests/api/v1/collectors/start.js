@@ -74,7 +74,10 @@ describe('tests/api/v1/collectors/start.js >', () => {
     })
     .then((c) => c.addCurrentGenerators([generator1, generator2]))
     .then(() => done())
-    .catch(done);
+    .catch((err) => {
+      console.error(err);
+      done(err);
+    });
   });
 
   afterEach(u.forceDelete);
