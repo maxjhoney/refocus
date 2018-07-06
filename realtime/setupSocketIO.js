@@ -69,7 +69,7 @@ function setupNamespace(io) {
     .then(() => room.find(
         {
           where: {
-            active: active,
+            active: true,
           }
         }
       )
