@@ -59,12 +59,12 @@ describe('tests/api/v1/collectors/start.js >', () => {
       const gen1 = sgUtils.getGenerator();
       gen1.name += 'generator-1';
       gen1.createdBy = user.id;
-      gen1.currentCollector = u.getCollectorToCreate();
+      gen1.currentCollector = u.getCollectorToCreate().name;
 
       const gen2 = sgUtils.getGenerator();
       gen2.name += 'generator-2';
       gen2.createdBy = user.id;
-      gen2.currentCollector = u.getCollectorToCreate();
+      gen2.currentCollector = u.getCollectorToCreate().name;
       // console.log(gen2)
       return Generator.bulkCreate([gen1, gen2]);
     })
@@ -76,7 +76,7 @@ describe('tests/api/v1/collectors/start.js >', () => {
     })
     .then((c) => {
       // console.log(c)
-      c.addCurrentGenerators([generator1, generator2])
+      c.addPossibleGenerators([generator1, generator2])
     })
     .then(() => done())
     .catch((err) => {
@@ -89,7 +89,7 @@ describe('tests/api/v1/collectors/start.js >', () => {
   after(tu.forceDeleteUser);
 
   describe('if the collector is registered and status is STOPPED >', () => {
-    it.only('if the user is among the writers, start the collector ' +
+    it('if the user is among the writers, start the collector ' +
       'and return the expected response', (done) => {
       api.post(path)
       .set('Authorization', token)
