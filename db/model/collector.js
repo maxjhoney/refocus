@@ -198,10 +198,11 @@ module.exports = function collector(seq, dataTypes) {
       foreignKey: 'collectorId',
     });
 
-    // assoc.currentGenerators = Collector.hasMany(models.Generator, {
-    //   as: 'currentGenerators',
-    //   foreignKey: 'collectorId',
-    // });
+    assoc.currentGenerators = Collector.hasMany(models.Generator, {
+      as: 'currentGenerators',
+      foreignKey: 'collectorId',
+      hooks: true,
+    });
 
     assoc.createdBy = Collector.belongsTo(models.User, {
       foreignKey: 'createdBy',
@@ -259,7 +260,7 @@ module.exports = function collector(seq, dataTypes) {
    * @returns {Promise<Array<Generator>>}
    */
   Collector.prototype.reassignGenerators = function () {
-    /* TODO: change to use possibleGenerators once that includes current gens only */
+    /* TODO: change to use currentGenerators once that includes current gens only */
     return seq.models.Generator.findAll({ where: { currentCollector: this.name } })
     .then((gens) => Promise.all(gens.map((g) => g.assignToCollector())));
   };

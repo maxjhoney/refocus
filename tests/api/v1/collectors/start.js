@@ -59,13 +59,13 @@ describe('tests/api/v1/collectors/start.js >', () => {
       const gen1 = sgUtils.getGenerator();
       gen1.name += 'generator-1';
       gen1.createdBy = user.id;
-      gen1.currentCollector = u.getCollectorToCreate().name;
+      gen1.currentCollector = u.getCollectorToCreate();
+      console.log(gen1)
 
       const gen2 = sgUtils.getGenerator();
       gen2.name += 'generator-2';
       gen2.createdBy = user.id;
-      gen2.currentCollector = u.getCollectorToCreate().name;
-      // console.log(gen2)
+      gen2.currentCollector = u.getCollectorToCreate();
       return Generator.bulkCreate([gen1, gen2]);
     })
     .then((generators) => {
@@ -94,7 +94,7 @@ describe('tests/api/v1/collectors/start.js >', () => {
       api.post(path)
       .set('Authorization', token)
       .send(defaultCollector)
-      // .expect(constants.httpStatus.OK)
+      .expect(constants.httpStatus.OK)
       .end((err, res) => {
         if (err) {
           return done(err);
