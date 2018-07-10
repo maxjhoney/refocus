@@ -220,8 +220,9 @@ function perspectiveEmit(nspComponents, obj) {
  * variable happens here. The nspComponents are decoded to various filters and the
  * filters are compared with the obj to decide whether this object should be
  * emitted over the namespace identified by the nspComponents variable
- * @param  {String} nspComponents - array of namespace strings for filtering
- * @param  {Object} obj - Object that is to be emitted to the client
+ * @param {String} nspComponents - array of namespace strings for filtering
+ * @param {Object} obj - Object that is to be emitted to the client
+ * @param {Object} pubOpts - Options for client and channel to publish with.
  * @returns {Boolean} - true if this obj is to be emitted over this namespace
  * identified by this namespace string.
  */
@@ -237,9 +238,10 @@ function botEmit(nspComponents, obj, pubOpts) {
 /**
   * Splits up the nspString into its components and decides if it is a bot
   * or a perspective that needs to be emitted
-  * @param  {String} nspString - A namespace string, that identifies a
+  * @param {String} nspString - A namespace string, that identifies a
   * socketio namespace
-  * @param  {Object} obj - Object that is to be emitted to the client
+  * @param {Object} obj - Object that is to be emitted to the client
+  * @param {Object} pubOpts - Options for client and channel to publish with.
   * @returns {Boolean} - true if this obj is to be emitted over this namespace
   * identified by this namespace string.
   */
