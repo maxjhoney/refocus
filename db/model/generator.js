@@ -415,25 +415,11 @@ module.exports = function generator(seq, dataTypes) {
    * @returns {Promise} created generator with collectors (if any)
    */
   Generator.prototype.updateWithCollectors = function (requestBody) {
-<<<<<<< HEAD
-    let collectors; // will be populated with actual collectors
-    return new seq.Promise((resolve, reject) => {
-      sgUtils.validateCollectors(seq, requestBody.possibleCollectors)
-      .then((_collectors) => { // collectors list in request body
-        collectors = _collectors;
-        return this.update(requestBody);
-      })
-      .then(() => this.addPossibleCollectors(collectors))
-      .then(() => resolve(this.reload()))
-      .catch(reject);
-    });
-=======
     return Promise.resolve()
     .then(() => sgUtils.validateCollectors(seq, requestBody.possibleCollectors))
     .then((collectors) => this.addPossibleCollectors(collectors))
     .then(() => this.update(requestBody))
     .then(() => this.reload());
->>>>>>> change-collectors-possibleCollectors
   };
 
   Generator.prototype.isWritableBy = function (who) {
@@ -487,10 +473,7 @@ module.exports = function generator(seq, dataTypes) {
       this.currentCollector = null;
     }
   };
-<<<<<<< HEAD
 
   // seq.sync()
   return Generator;
-=======
->>>>>>> change-collectors-possibleCollectors
 };
