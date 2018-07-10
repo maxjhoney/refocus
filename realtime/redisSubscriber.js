@@ -52,7 +52,7 @@ module.exports = (io) => {
        * pass on the message received through the redis subscriber to the socket
        * io emitter to send data to the browser clients.
        */
-      emitter(io, key, parsedObj);
+      emitter(io, key, parsedObj, parsedObj.pubOpts);
     });
   });
 };

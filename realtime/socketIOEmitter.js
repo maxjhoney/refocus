@@ -16,7 +16,11 @@ const rtUtils = require('./utils');
 const initPerspectiveEvent = 'refocus.internal.realtime.perspective.namespace.initialize';
 const initBotEvent = 'refocus.internal.realtime.bot.namespace.initialize';
 
-module.exports = (io, key, obj) => {
+module.exports = (io, key, obj, pubOpts) => {
+  if (obj.pubOpts) {
+    delete obj.pubOpts;
+  }
+
   // newObjectAsString contains { key: {new: obj }}
   let newObjectAsString = rtUtils.getNewObjAsString(key, obj);
 
@@ -32,12 +36,7 @@ module.exports = (io, key, obj) => {
   for (const nsp in io.nsps) {
     // Send events only if namespace connections > 0
     if (nsp && Object.keys(nsp).length &&
-     rtUtils.shouldIEmitThisObj(nsp, obj)) {
-      if (obj.pubOpts) {
-        delete obj.pubOpts;
-        newObjectAsString = rtUtils.getNewObjAsString(key, obj);
-      }
-
+     rtUtils.shouldIEmitThisObj(nsp, obj, pubOpts)) {
       io.of(nsp).emit(key, newObjectAsString);
     }
   }
