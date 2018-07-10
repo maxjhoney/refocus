@@ -279,5 +279,6 @@ module.exports = function collector(seq, dataTypes) {
       }));
   }; // isWritableBy
 
+  // seq.sync()
   return Collector;
 }; // exports

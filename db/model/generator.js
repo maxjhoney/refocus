@@ -472,5 +472,6 @@ module.exports = function generator(seq, dataTypes) {
     });
   };
 
+  // seq.sync()
   return Generator;
 };
