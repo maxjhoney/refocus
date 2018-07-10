@@ -74,10 +74,7 @@ describe('tests/api/v1/collectors/start.js >', () => {
       generator2 = generators[1];
       return Collector.create(u.getCollectorToCreate());
     })
-    .then((c) => {
-      // console.log(c)
-      c.addPossibleGenerators([generator1, generator2])
-    })
+    .then((c) => c.addPossibleGenerators([generator1, generator2]))
     .then(() => done())
     .catch((err) => {
       console.error(err);
