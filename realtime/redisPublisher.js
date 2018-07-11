@@ -72,7 +72,7 @@ function prepareToPublish(inst, changedKeys, ignoreAttributes) {
  * @returns {Object} - object that was published
  */
 function publishObject(inst, event, changedKeys, ignoreAttributes, opts) {
-  debug('publishObject inst=%O', inst);
+  debug('publishObject inst %o', inst);
   const obj = {};
   obj[event] = inst;
 
@@ -118,7 +118,7 @@ function publishObject(inst, event, changedKeys, ignoreAttributes, opts) {
  * @returns {Promise} - which resolves to a sample object
  */
 function publishSample(sampleInst, subjectModel, event, aspectModel) {
-  debug('publishSample sampleInst=%O', sampleInst);
+  debug('publishSample sampleInst %o', sampleInst);
   const eventType = event || getSampleEventType(sampleInst);
   let prom;
 
@@ -132,6 +132,7 @@ function publishSample(sampleInst, subjectModel, event, aspectModel) {
 
   return prom.then((sample) => {
     if (sample) {
+      sample.absolutePath = sample.subject.absolutePath; // reqd for filtering
       publishObject(sample, eventType);
       return sample;
     }

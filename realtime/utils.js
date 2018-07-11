@@ -11,6 +11,7 @@
  */
 'use strict'; // eslint-disable-line strict
 const ip = require('ip');
+const debug = require('debug')('refocus:realtime');
 const constants = require('./constants');
 const redisClient = require('../cache/redisCache').client.sampleStore;
 const redisStore = require('../cache/sampleStore');
@@ -118,6 +119,7 @@ function isPresent(filterValueSet, objValueArr) {
  * otherwise.
  */
 function applyFilter(filterString, objValues) {
+  debug('applyFilter %s => %o', filterString, objValues);
   const objValueArr = [];
   if (objValues && Array.isArray(objValues)) {
     objValues.forEach((obj) => {
@@ -186,6 +188,7 @@ function applyFilter(filterString, objValues) {
  * identified by this namespace string.
  */
 function perspectiveEmit(nspComponents, obj) {
+  debug('perspectiveEmit %o ==> %o', nspComponents, obj);
   const aspectFilter = nspComponents[constants.aspectFilterIndex];
   const subjectTagFilter = nspComponents[constants.subjectTagFilterIndex];
   const aspectTagFilter = nspComponents[constants.aspectTagFilterIndex];
@@ -244,11 +247,14 @@ function botEmit(nspComponents, obj) {
   * identified by this namespace string.
   */
 function shouldIEmitThisObj(nspString, obj) {
+  debug('shouldIEmitThisObj? %s ==> %o', nspString, obj);
+
   // extract all the components that makes up a namespace.
   const nspComponents = nspString.split(constants.filterSeperator);
   const absPathNsp = nspComponents[constants.asbPathIndex];
   const absolutePathObj = '/' + obj.absolutePath;
-
+  debug('shouldIEmitThisObj nspComponents=%o, absPathNsp=%s, absolutePathObj=%s',
+    nspComponents, absPathNsp, absolutePathObj);
   if ((absolutePathObj).startsWith(absPathNsp)) {
     return perspectiveEmit(nspComponents, obj);
   } else if (absPathNsp === botAbsolutePath) {

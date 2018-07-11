@@ -17,7 +17,7 @@ const initPerspectiveEvent =
 const initBotEvent = 'refocus.internal.realtime.bot.namespace.initialize';
 
 module.exports = (io, key, obj) => {
-  debug('socketIOEmitter key=%S obj=%O', key, obj);
+  debug('socketIOEmitter key=%s obj=%o', key, obj);
 
   // newObjectAsString contains { key: {new: obj }}
   let newObjectAsString = rtUtils.getNewObjAsString(key, obj);
@@ -30,6 +30,8 @@ module.exports = (io, key, obj) => {
   if (key.startsWith(initBotEvent)) {
     rtUtils.initializeBotNamespace(obj, io);
   }
+
+  const namespacesEmitted = [];
 
   /*
    * Socket.io does not expose any API to retrieve list of all the namespaces
@@ -50,6 +52,7 @@ module.exports = (io, key, obj) => {
      * Ref. https://socket.io/docs/server-api/#namespace-connected.
      */
     const connections = Object.keys(namespace.connected);
+    debug('namepace "%s" connections %o', n, connections, connections.length);
     if (connections.length > 0) {
       /* Check the perspective/room filters before emitting. */
       if (rtUtils.shouldIEmitThisObj(n, obj)) {
@@ -58,8 +61,12 @@ module.exports = (io, key, obj) => {
           newObjectAsString = rtUtils.getNewObjAsString(key, obj);
         }
 
+        namespacesEmitted.push(n);
         namespace.emit(key, newObjectAsString);
       }
     }
   });
+
+  debug('socketIOEmitter emitted key=%s str=%s to namespaces %o', key,
+    newObjectAsString, namespacesEmitted);
 };
