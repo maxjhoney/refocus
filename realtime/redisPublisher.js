@@ -10,6 +10,7 @@
  * ./realTime/redisPublisher.js
  */
 'use strict'; // eslint-disable-line strict
+const debug = require('debug')('refocus:realtime');
 const rtUtils = require('./utils');
 const config = require('../config');
 const client = require('../cache/redisCache').client;
@@ -59,18 +60,19 @@ function prepareToPublish(inst, changedKeys, ignoreAttributes) {
 
 /**
  * This function publishes an created, updated or a deleted model instance to
- * the redis channel and returns the object that was published
+ * the redis channel and returns the object that was published.
  *
  * @param  {Object} inst - Model instance to be published
  * @param  {String} event  - Type of the event that is being published
  * @param  {[Array]} changedKeys - An array containing the fields of the model
- * that were changed
+ *   that were changed
  * @param  {[Array]} ignoreAttributes An array containing the fields of the
- * model that should be ignored
+ *  model that should be ignored
  * @param  {Object} opts - Options for which client and channel to publish with
  * @returns {Object} - object that was published
  */
 function publishObject(inst, event, changedKeys, ignoreAttributes, opts) {
+  debug('publishObject inst=%O', inst);
   const obj = {};
   obj[event] = inst;
 
@@ -94,7 +96,9 @@ function publishObject(inst, event, changedKeys, ignoreAttributes, opts) {
   }
 
   if (obj[event]) {
-    pubClient.publish(channelName, JSON.stringify(obj));
+    const str = JSON.stringify(obj);
+    debug('publishObject publishing object %O to channel %s', str, channelName);
+    pubClient.publish(channelName, str);
   }
 
   return obj;
@@ -114,6 +118,7 @@ function publishObject(inst, event, changedKeys, ignoreAttributes, opts) {
  * @returns {Promise} - which resolves to a sample object
  */
 function publishSample(sampleInst, subjectModel, event, aspectModel) {
+  debug('publishSample sampleInst=%O', sampleInst);
   const eventType = event || getSampleEventType(sampleInst);
   let prom;
 

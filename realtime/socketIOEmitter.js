@@ -10,12 +10,15 @@
  * ./realtime/socketIOEmitter.js
  */
 'use strict'; // eslint-disable-line strict
+const debug = require('debug')('refocus:realtime');
 const rtUtils = require('./utils');
 const initPerspectiveEvent =
   'refocus.internal.realtime.perspective.namespace.initialize';
 const initBotEvent = 'refocus.internal.realtime.bot.namespace.initialize';
 
 module.exports = (io, key, obj) => {
+  debug('socketIOEmitter key=%S obj=%O', key, obj);
+
   // newObjectAsString contains { key: {new: obj }}
   let newObjectAsString = rtUtils.getNewObjAsString(key, obj);
 
