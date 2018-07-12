@@ -18,6 +18,7 @@ const gtUtil = u.gtUtil;
 const Collector = tu.db.Collector;
 const Generator = tu.db.Generator;
 const GeneratorTemplate = tu.db.GeneratorTemplate;
+const sinon = require('sinon');
 const ZERO = 0;
 const ONE = 1;
 const TWO = 2;
@@ -32,6 +33,16 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
   let userInst;
   const generator = JSON.parse(JSON.stringify(u.getGenerator()));
   const generatorTemplate = gtUtil.getGeneratorTemplate();
+
+  let clock;
+  const now = Date.now(); // some time T1
+
+  // used to make collector alive
+  before(() => {
+    collector1.status = 'Running';
+    collector1.lastHeartbeat = now;
+    clock = sinon.useFakeTimers(now);
+  });
 
   before((done) => {
     tu.createUser('GeneratorOwner')
@@ -54,6 +65,8 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
     .catch(done);
   });
 
+  afterEach(() => clock.restore());
+
   // delete generator after each test
   afterEach(() => tu.forceDelete(tu.db.Generator, testStartTime));
   after(u.forceDelete);
@@ -71,7 +84,7 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
       collector2.name,
       collector3.name,
     ];
-    localGenerator.currentCollector = collector1.name;
+    localGenerator.isActive = true;
 
     Generator.createWithCollectors(localGenerator)
     .then((o) => {
@@ -91,7 +104,7 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
       expect(o.helpUrl).to.equal(generator.helpUrl);
       expect(o.helpEmail).to.equal(generator.helpEmail);
       expect(o.createdBy).to.equal(generator.createdBy);
-      expect(o.isActive).to.equal(false);
+      expect(o.isActive).to.equal(true);
       expect(o.generatorTemplate.name).to.equal('refocus-ok-template');
       expect(o.generatorTemplate.version).to.equal('1.0.0');
       expect(typeof o.getWriters).to.equal('function');

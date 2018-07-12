@@ -179,7 +179,6 @@ module.exports = {
     validateGeneratorAspectsPermissions(toPost.aspects, req)
     .then(() =>
       helper.model.createWithCollectors(toPost))
-    .then((o) => o.reload())
     .then((o) => {
       resultObj.dbTime = new Date() - resultObj.reqStartTime;
       u.sortArrayObjectsByField(helper, o); // order collectors by name
@@ -229,8 +228,8 @@ module.exports = {
        updateInstance saves us a call to reload the instance to reflect
        updated collectors.
        */
-      // console.log(_collectors);
-      instance.setDataValue('possibleCollectors', _collectors);
+      instance.set('possibleCollectors', _collectors);
+      instance.changed('possibleCollectors', true);
       return instance.setPossibleCollectors(_collectors);
     })
     .then(() => u.updateInstance(instance, puttableFields, toPut))
