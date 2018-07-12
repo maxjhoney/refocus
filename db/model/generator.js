@@ -175,8 +175,8 @@ module.exports = function generator(seq, dataTypes) {
          */
         // console.log(inst);
         let isCurrentCollectorIncluded = false;
-        if (inst.get('possibleCollectors')) {
-          isCurrentCollectorIncluded = inst.get('possibleCollectors').some(
+        if (inst.possibleCollectors) {
+          isCurrentCollectorIncluded = inst.possibleCollectors.some(
             (coll) => coll.name === inst.currentCollector
           );
         }
@@ -211,7 +211,6 @@ module.exports = function generator(seq, dataTypes) {
       }, // beforeDestroy
 
       afterCreate(inst /* , opts*/) {
-        // inst.assignToCollector();
         return Promise.all([
           Promise.resolve().then(() => {
             if (inst.currentCollector) {
@@ -224,7 +223,10 @@ module.exports = function generator(seq, dataTypes) {
               return inst.addWriter(inst.createdBy);
             }
           }),
-          // inst.save(),
+          Promise.resolve().then(() => {
+            inst.assignToCollector();
+            return inst.save();
+          }),
         ]);
       }, // afterCreate
 
@@ -487,7 +489,9 @@ module.exports = function generator(seq, dataTypes) {
      inst.possibleCollectors because we set collectors in place at api layer
      using instance.setDataValue('possibleCollectors', ...);
      */
-    const instCollectors = this.get('possibleCollectors');
+    
+    // console.log('assignToCollector', this);
+    const instCollectors = this.possibleCollectors;
     if (this.isActive && instCollectors && instCollectors.length) {
       instCollectors.sort((c1, c2) => c1.name > c2.name);
       const newColl = instCollectors.find((c) => c.isRunning() && c.isAlive());
