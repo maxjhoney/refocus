@@ -95,11 +95,13 @@ function createGenerator(gen, userId, collector) {
   gen.createdBy = userId;
 
   if (collector) {
+    gen.isActive = true;
     gen.currentCollector = collector.name;
-  } else {
-    gen.currentCollector = undefined;
+    gen.possibleCollectors = [collector.name];
+    return Generator.createWithCollectors(gen);
   }
 
+  gen.currentCollector = undefined;
   return Generator.create(gen);
 }
 

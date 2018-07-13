@@ -272,6 +272,22 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
     });
 
     describe('generator changes >', () => {
+      // const now = Date.now();
+      // let clock;
+      // beforeEach(() => {
+      //   clock = sinon.useFakeTimers(now);
+      // });
+
+      // before((done) => {
+      //   tu.db.Generator.destroy({ where: { name: generator.name }, force: true })
+
+      //   // creates alive and running collector
+      //   .then(() => tu.db.Collector.create(collector4))
+      //   .then(() => done())
+      //   .catch(done);
+      // });
+
+      // afterEach(() => clock.restore());
       // reset the tracked changes
       beforeEach((done) => {
         Promise.resolve()
