@@ -90,18 +90,48 @@ function getCollector(userToken, collector) {
   .endAsync();
 }
 
-function createGenerator(gen, userId, collector) {
+/**
+ * 
+ * @param  {[type]} gen         [description]
+ * @param  {[type]} userId      [description]
+ * @param  {[type]} collectors  - obj, array of collectors, empty array, null
+ * @param  {[type]} currCollObj [description]
+ * @return {[type]}             [description]
+ */
+function createGenerator(gen, userId=null, collectors, currentCollector=null) {
+  debugger;
   gen = JSON.parse(JSON.stringify(gen));
   gen.createdBy = userId;
 
-  if (collector) {
+  // collectors is null or empty array
+  if (!collectors || (Array.isArray(collectors) && collectors.length === 0)) {
+    gen.currentCollector = undefined;
+    return Generator.create(gen);
+  }
+
+  // collectors is a collector object
+  if (!Array.isArray(collectors)) { // collectors = object
+    // collectors is one collector object in this case,
+    // assign curr collector to same as collectors
     gen.isActive = true;
-    gen.currentCollector = collector.name;
-    gen.possibleCollectors = [collector.name];
+    gen.possibleCollectors = [collectors.name];
+    gen.currentCollector = collectors.name;
     return Generator.createWithCollectors(gen);
   }
 
-  gen.currentCollector = undefined;
+  // collectors is an array with length > 0
+  if (collectors.length) { // not empty array
+    gen.possibleCollectors = [];
+    collectors.forEach((coll) => gen.possibleCollectors.push(coll.name));
+
+    if (currentCollector) { // need to assign curr collector
+      gen.isActive = true;
+      gen.currentCollector = currentCollector.name;
+    }
+
+    return Generator.createWithCollectors(gen);
+  }
+
   return Generator.create(gen);
 }
 

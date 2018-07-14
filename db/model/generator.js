@@ -173,7 +173,6 @@ module.exports = function generator(seq, dataTypes) {
          inst.possibleCollectors because we set collectors in place at api layer
          using instance.setDataValue('possibleCollectors', ...);
          */
-        // console.log(inst);
         let isCurrentCollectorIncluded = false;
         if (inst.possibleCollectors) {
           isCurrentCollectorIncluded = inst.possibleCollectors.some(
@@ -225,7 +224,7 @@ module.exports = function generator(seq, dataTypes) {
           }),
           Promise.resolve().then(() => {
             inst.assignToCollector();
-            return inst.save();
+            return inst.save({ hooks: false });
           }),
         ]);
       }, // afterCreate
@@ -411,7 +410,11 @@ module.exports = function generator(seq, dataTypes) {
     .then(() => createdGenerator.save())
     .then((gen) => createdGenerator = gen)
     .then(() => createdGenerator.addPossibleCollectors(collectors))
-    .then(() => createdGenerator.reload());
+    .then(() => createdGenerator.reload())
+    .then((returnedObj) => {
+      // console.log("returnedObj>>>", returnedObj);
+      return returnedObj;
+    });
   };
 
   Generator.findForHeartbeat = function (findOpts) {

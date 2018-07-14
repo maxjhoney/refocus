@@ -823,7 +823,7 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
           const reencryptedSG = res.body.generatorsAdded[0];
           expect(reencryptedSG).to.not.equal(undefined);
           expect(reencryptedSG.context.secretInformation)
-          .to.not.equal(encryptedSG.secretInformation);
+          .to.not.equal(encryptedSG.context.secretInformation);
           expect(reencryptedSG.context.otherNonSecretInformation)
           .equal(otherNonSecretInformation);
 
