@@ -209,15 +209,18 @@ describe('tests/db/model/collector/methods.js >', () => {
     });
 
     describe('reassignGenerators >', () => {
-      beforeEach(() =>
-        GeneratorTemplate.create(generatorTemplate)
+      beforeEach((done) => GeneratorTemplate.create(generatorTemplate)
         .then((gt1) => generatorTemplate.id = gt1.id)
         .then(() => Promise.join(
-          Generator.createWithCollectors(generator1),
-          Generator.createWithCollectors(generator2),
-          Generator.createWithCollectors(generator3),
-        ))
-      );
+            Generator.create(generator1, { validate: false, hooks: false }),
+            Generator.create(generator2, { validate: false, hooks: false }),
+            Generator.create(generator3, { validate: false, hooks: false }),
+          ).spread((gen1, gen2, gen3) => Promise.join(
+              gen1.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+              gen2.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+              gen3.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+            )
+          ).then(() => done())));
 
       afterEach(u.forceDelete);
 
