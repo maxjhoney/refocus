@@ -162,7 +162,10 @@ module.exports = function generator(seq, dataTypes) {
                 throw new dbErrors.SampleGeneratorContextEncryptionError();
               });
           })
-          .then(() => inst.assignToCollector());
+          .then(() => {
+            // console.log('beforeCreate hook>>>>');
+            return inst.assignToCollector();
+          });
       }, // beforeCreate
 
       beforeUpdate(inst /* , opts */) {
@@ -497,6 +500,7 @@ module.exports = function generator(seq, dataTypes) {
      */
     
     // console.log('assignToCollector', this);
+    // debugger;
     const instCollectors = this.possibleCollectors;
     if (this.isActive && instCollectors && instCollectors.length) {
       instCollectors.sort((c1, c2) => c1.name > c2.name);
