@@ -124,6 +124,10 @@ module.exports = function collector(seq, dataTypes) {
           throw new ValidationError(msg);
         }
       }, // hooks.beforeUpdate
+
+      afterUpdate(inst /* , opts */) {
+        return inst.reassignGenerators();
+      }, // hooks.afterUpdate
     }, // hooks
     indexes: [
       {

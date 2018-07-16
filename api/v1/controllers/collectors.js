@@ -475,25 +475,7 @@ function stopCollector(req, res, next) {
     value: { status: 'Stopped' },
   };
 
-  const resultObj = { reqStartTime: req.timestamp };
-  const requestBody = req.swagger.params.queryBody.value;
-
-  let returnValue;
-
-  u.findByKey(helper, req.swagger.params)
-  .then((o) => u.isWritable(req, o))
-  .then((o) => {
-    u.patchJsonArrayFields(o, requestBody, helper);
-    u.patchArrayFields(o, requestBody, helper);
-
-    return o.update(requestBody);
-  })
-  .then((retVal) => {
-    returnValue = retVal;
-    return retVal.reassignGenerators();
-  })
-  .then(() => u.handleUpdatePromise(resultObj, req, returnValue, helper, res))
-  .catch((err) => u.handleError(next, err, helper.modelName));
+  doPatch(req, res, next, helper);
 } // stopCollector
 
 /**
@@ -511,24 +493,7 @@ function pauseCollector(req, res, next) {
     value: { status: 'Paused' },
   };
 
-  const resultObj = { reqStartTime: req.timestamp };
-  const requestBody = req.swagger.params.queryBody.value;
-  let returnValue;
-
-  u.findByKey(helper, req.swagger.params)
-  .then((o) => u.isWritable(req, o))
-  .then((o) => {
-    u.patchJsonArrayFields(o, requestBody, helper);
-    u.patchArrayFields(o, requestBody, helper);
-
-    return o.update(requestBody);
-  })
-  .then((retVal) => {
-    returnValue = retVal;
-    return retVal.reassignGenerators();
-  })
-  .then(() => u.handleUpdatePromise(resultObj, req, returnValue, helper, res))
-  .catch((err) => u.handleError(next, err, helper.modelName));
+  doPatch(req, res, next, helper);
 } // pauseCollector
 
 /**
