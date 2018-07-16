@@ -29,6 +29,9 @@ const gtUtil = sgUtils.gtUtil;
 
 describe('tests/db/model/collector/methods.js >', () => {
   let clock;
+  let dbCollector1;
+  let dbCollector2;
+  let dbCollector3;
 
   const collector1 = u.getCollectorObj();
   const collector2 = u.getCollectorObj();
@@ -63,11 +66,16 @@ describe('tests/db/model/collector/methods.js >', () => {
   generator2.isActive = true;
   generator3.isActive = true;
 
-  beforeEach(() => Promise.join(
+  beforeEach((done) => Promise.join(
     Collector.create(collector1),
     Collector.create(collector2),
     Collector.create(collector3),
-  ));
+  ).spread((col1, col2, col3) => {
+    dbCollector1 = col1;
+    dbCollector2 = col2;
+    dbCollector3 = col3;
+    return done();
+  }));
 
   afterEach(() => clock.restore());
   afterEach(u.forceDelete);
@@ -106,16 +114,18 @@ describe('tests/db/model/collector/methods.js >', () => {
     });
 
     describe('checkMissedHeartbeat >', () => {
-
-      beforeEach(() =>
-        GeneratorTemplate.create(generatorTemplate)
+      beforeEach((done) => GeneratorTemplate.create(generatorTemplate)
         .then((gt1) => generatorTemplate.id = gt1.id)
         .then(() => Promise.join(
-          Generator.createWithCollectors(generator1),
-          Generator.createWithCollectors(generator2),
-          Generator.createWithCollectors(generator3),
-        ))
-      );
+            Generator.create(generator1, { validate: false, hooks: false }),
+            Generator.create(generator2, { validate: false, hooks: false }),
+            Generator.create(generator3, { validate: false, hooks: false }),
+          ).spread((gen1, gen2, gen3) => Promise.join(
+              gen1.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+              gen2.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+              gen3.setPossibleCollectors([dbCollector1, dbCollector2, dbCollector3]),
+            )
+          ).then(() => done())));
 
       afterEach(u.forceDelete);
 

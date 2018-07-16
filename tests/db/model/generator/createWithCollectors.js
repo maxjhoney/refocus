@@ -64,7 +64,7 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
     expect(Generator.getProfileAccessField()).to.equal('generatorAccess');
   });
 
-  it('ok, create with all fields', (done) => {
+  it.only('ok, create with all fields', (done) => {
     const localGenerator = JSON.parse(JSON.stringify(generator));
     localGenerator.possibleCollectors = [
       collector1.name,

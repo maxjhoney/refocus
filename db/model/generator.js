@@ -161,7 +161,8 @@ module.exports = function generator(seq, dataTypes) {
               .catch(() => {
                 throw new dbErrors.SampleGeneratorContextEncryptionError();
               });
-          });
+          })
+          .then(() => inst.assignToCollector());
       }, // beforeCreate
 
       beforeUpdate(inst /* , opts */) {
@@ -182,6 +183,7 @@ module.exports = function generator(seq, dataTypes) {
 
         if (inst.changed('isActive') ||
          (inst.changed('possibleCollectors') && !isCurrentCollectorIncluded)) {
+          // console.log('afterUpdate hook>>>>');
           inst.assignToCollector();
         }
 
@@ -222,10 +224,11 @@ module.exports = function generator(seq, dataTypes) {
               return inst.addWriter(inst.createdBy);
             }
           }),
-          Promise.resolve().then(() => {
-            inst.assignToCollector();
-            return inst.save({ hooks: false });
-          }),
+          // Promise.resolve().then(() => {
+          //   console.log('afterCreate hook>>>>');
+          //   inst.assignToCollector();
+          //   return inst.save({ hooks: false, validate: false });
+          // }),
         ]);
       }, // afterCreate
 
