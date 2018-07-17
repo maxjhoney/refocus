@@ -37,11 +37,10 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
   let clock;
   const now = Date.now(); // some time T1
 
-  collector1.status = 'Running';
-  collector1.lastHeartbeat = now;
-
   // used to make collector alive
   before(() => {
+    collector1.status = 'Running';
+    collector1.lastHeartbeat = now;
     clock = sinon.useFakeTimers(now);
   });
 
@@ -86,7 +85,6 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
       collector3.name,
     ];
     localGenerator.isActive = true;
-    localGenerator.currentCollector = collector1.name;
 
     Generator.createWithCollectors(localGenerator)
     .then((o) => {
