@@ -143,25 +143,14 @@ describe('tests/api/v1/collectors/start.js >', () => {
 
     it('starting collector assigns this collector to unassigned and active ' +
       'generators with this possible collector', (done) => {
-      let genInst;
       const gen3 = sgUtils.getGenerator();
       gen3.name += 'generator-3';
       gen3.createdBy = user.id;
+      gen3.isActive = true;
+      gen3.possibleCollectors = [collector1.name];
       sgUtils.createSGtoSGTMapping(generatorTemplate, gen3);
 
-      Generator.create(gen3)
-      .then((createdGen) => { // create gen3
-        genInst = createdGen;
-
-        // add collector1 to the possible list of collectors of gen3
-        return createdGen.addPossibleCollectors(collector1);
-      })
-      .then(() => genInst.reload())
-      .then((updatedInst) => {
-        // check gen3 current collector is null
-        expect(updatedInst.currentCollector).to.be.equal(null);
-        return updatedInst.update({ isActive: true }); // make gen3 active
-      })
+      Generator.createWithCollectors(gen3)
       .then(() => {
         api.post(path)
         .set('Authorization', token)

@@ -370,9 +370,9 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
         it('update move', (done) => {
           Promise.resolve()
           .then(() => u.createGenerator(generator1, userId, collector1))
-          .then(() => u.sendHeartbeat(collector1, collectorTokens))
+          .then((createdGen) => u.sendHeartbeat(collector1, collectorTokens))
           .then(() => u.updateGenerator(generator1, userToken, collector2))
-          .then(() => u.sendHeartbeat(collector1, collectorTokens))
+          .then((updatedGen) => u.sendHeartbeat(collector1, collectorTokens))
           .then((res) => u.expectLengths({ added: 0, deleted: 1, updated: 0 }, res))
           .then(() => u.sendHeartbeat(collector2, collectorTokens))
           .then((res) => u.expectLengths({ added: 1, deleted: 0, updated: 0 }, res))

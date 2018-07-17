@@ -10,6 +10,7 @@
  * api/v1/controllers/collectors.js
  */
 'use strict'; // eslint-disable-line strict
+const featureToggles = require('feature-toggles');
 const Promise = require('bluebird');
 const jwtUtil = require('../../../utils/jwtUtil');
 const apiErrors = require('../apiErrors');
@@ -375,6 +376,9 @@ function startCollector(req, res, next) {
   const body = req.swagger.params.queryBody.value;
   body.status = 'Running';
   body.createdBy = req.user.id;
+
+  // Set lastHeartbeat to make collector alive for generators to be assigned
+  body.lastHeartbeat = Date.now();
   let collToReturn;
   return helper.model.findOne({ where: { name: body.name } })
   /* Already exists? Verify that this user has write permission. */
@@ -401,37 +405,14 @@ function startCollector(req, res, next) {
 
     return coll;
   })
-
-  /* Update or create collector. If collector is updated, find active and
-     unassigned generators. For each generator, assign to collector. */
+  /* Update or create */
+  .then((coll) => coll ? coll.update(body) : helper.model.create(body))
   .then((coll) => {
-    // Set lastHeartbeat to make collector alive for generators to be assigned
-    body.lastHeartbeat = Date.now();
-    if (coll) {
-      return coll.update(body)
-      .then((updatedColl) => {
-        collToReturn = updatedColl;
-        return Generator.findAll(
-          { where: { currentCollector: null, isActive: true } }
-        );
-      })
-      .then((unassignedGenerators) => Promise.map(unassignedGenerators,
-        (generator) => {
-          generator.assignToCollector();
-          return generator.save();
-        }));
-    }
+    collToReturn = coll;
+    /* TODO: change to use currentGenerators once that includes current gens only */
 
-    return helper.model.create(body)
-    .then((createdColl) => {
-      collToReturn = createdColl;
-      return Promise.resolve();
-    });
+    return Generator.findAll({ where: { currentCollector: coll.name } });
   })
-  /* TODO: change to use currentGenerators once that includes current gens only */
-  .then(() => Generator.findAll(
-    { where: { currentCollector: collToReturn.name } })
-  )
   /* Add all the attributes necessary to send back to collector. */
   .then((gens) => Promise.all(gens.map((g) => g.updateForHeartbeat())))
   .then((gens) => {
@@ -464,7 +445,7 @@ function startCollector(req, res, next) {
  * POST /collectors/{key}/stop
  *
  * Change collector status to Stopped. Invalid if the collector's status is
- * Stopped. Reassign corresponding generators.
+ * Stopped.
  *
  * @param {IncomingMessage} req - The request object
  * @param {ServerResponse} res - The response object
@@ -474,7 +455,6 @@ function stopCollector(req, res, next) {
   req.swagger.params.queryBody = {
     value: { status: 'Stopped' },
   };
-
   doPatch(req, res, next, helper);
 } // stopCollector
 
@@ -482,7 +462,7 @@ function stopCollector(req, res, next) {
  * POST /collectors/{key}/pause
  *
  * Change collector status to Paused. Invalid if the collector's status is not
- * Running. Reassign corresponding generators.
+ * Running.
  *
  * @param {IncomingMessage} req - The request object
  * @param {ServerResponse} res - The response object
@@ -492,7 +472,6 @@ function pauseCollector(req, res, next) {
   req.swagger.params.queryBody = {
     value: { status: 'Paused' },
   };
-
   doPatch(req, res, next, helper);
 } // pauseCollector
 

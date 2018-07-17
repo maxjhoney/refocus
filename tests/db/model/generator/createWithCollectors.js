@@ -88,8 +88,6 @@ describe('tests/db/model/generator/createWithCollectors.js >', () => {
     localGenerator.isActive = true;
     localGenerator.currentCollector = collector1.name;
 
-    // collector1.update({ status: 'Running', lastHeartbeat: Date.now() })
-    // .then(() => Generator.createWithCollectors(localGenerator))
     Generator.createWithCollectors(localGenerator)
     .then((o) => {
       expect(o.possibleCollectors.length).to.equal(THREE);

@@ -17,6 +17,7 @@ const u = require('../helpers/collectorUtils');
 const assoc = {};
 const collectorConfig = require('../../config/collectorConfig');
 const MS_PER_SEC = 1000;
+const collectorStatus = constants.collectorStatuses;
 
 module.exports = function collector(seq, dataTypes) {
   const Collector = seq.define('Collector', {
@@ -102,6 +103,18 @@ module.exports = function collector(seq, dataTypes) {
         return common.setIsDeleted(seq.Promise, inst);
       }, // beforeDestroy
 
+      beforeCreate(/* inst , opts*/) {
+        return seq.models.Generator.findAll(
+          { where: { currentCollector: null, isActive: true } }
+        )
+        .then((unassignedGenerators) =>
+          Promise.all(unassignedGenerators.map((g) => {
+            g.assignToCollector();
+            return g.save();
+          })
+        ));
+      }, // hooks.beforeCreate
+
       afterCreate(inst /* , opts*/) {
         // Add createdBy user to Collector writers.
         if (inst.createdBy) {
@@ -113,7 +126,7 @@ module.exports = function collector(seq, dataTypes) {
         }
 
         return inst;
-      }, // hooks.beforeCreate
+      }, // hooks.afterCreate
 
       beforeUpdate(inst /* , opts */) {
         // Invalid status transition: [Stopped --> Paused]
@@ -123,11 +136,30 @@ module.exports = function collector(seq, dataTypes) {
             'This collector cannot be paused because it is not running.';
           throw new ValidationError(msg);
         }
+
+        return inst;
       }, // hooks.beforeUpdate
 
       afterUpdate(inst /* , opts */) {
-        return inst.reassignGenerators();
-      }, // hooks.afterUpdate
+        if (inst.changed('status')) {
+          if (inst.status === collectorStatus.Running) {
+            return seq.models.Generator.findAll(
+              { where: { currentCollector: null, isActive: true } }
+            )
+            .then((unassignedGenerators) =>
+              Promise.all(unassignedGenerators.map((g) => {
+                g.assignToCollector();
+                return g.save();
+              })
+            ));
+          } else if (inst.status === collectorStatus.Stopped ||
+            inst.status === collectorStatus.Paused) {
+            return inst.reassignGenerators();
+          }
+        }
+
+        return inst;
+      }, // afterUpdate
     }, // hooks
     indexes: [
       {
