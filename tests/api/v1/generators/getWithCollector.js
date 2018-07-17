@@ -18,6 +18,7 @@ const u = require('./utils');
 const gtUtil = u.gtUtil;
 const Generator = tu.db.Generator;
 const GeneratorTemplate = tu.db.GeneratorTemplate;
+const collectorUtils = require('../collectors/utils');
 const path = '/v1/generators';
 const expect = require('chai').expect;
 const ZERO = 0;
@@ -26,6 +27,8 @@ const TWO = 2;
 const THREE = 3;
 
 describe('tests/api/v1/generators/getWithCollector.js >', () => {
+  let userToken;
+  let userId;
   let token;
   let collector1 = { name: 'hello', version: '1.0.0' };
   let collector2 = { name: 'beautiful', version: '1.0.0' };
@@ -38,12 +41,10 @@ describe('tests/api/v1/generators/getWithCollector.js >', () => {
 
   const genWithOneCollector = u.getGenerator();
   genWithOneCollector.name = 'refocus-info-generator';
-  genWithOneCollector.currentCollector = collector1.name;
   u.createSGtoSGTMapping(generatorTemplate, genWithOneCollector);
 
   const genWithThreeCollectors = u.getGenerator();
   genWithThreeCollectors.name = 'refocus-critical-generator';
-  genWithThreeCollectors.currentCollector = collector1.name;
   u.createSGtoSGTMapping(generatorTemplate, genWithThreeCollectors);
 
   const sortedNames = [collector1, collector2, collector3]
@@ -51,6 +52,9 @@ describe('tests/api/v1/generators/getWithCollector.js >', () => {
     .sort();
 
   before((done) => {
+    // make collector 1 alive so that currentCollector can be assigned when creating generators
+    collector1.status = 'Running';
+    collector1.lastHeartbeat = Date.now();
     Promise.all([
       tu.db.Collector.create(collector1),
       tu.db.Collector.create(collector2),
@@ -69,18 +73,18 @@ describe('tests/api/v1/generators/getWithCollector.js >', () => {
     .then(() => Generator.create(genWithNoCollector))
     .then((gen) => {
       genWithNoCollector.id = gen.id;
-      return Generator.create(genWithOneCollector);
+      return collectorUtils.createGenerator(genWithOneCollector, null, collector1);
     })
     .then((gen) => {
       genWithOneCollector.id = gen.id;
-      return gen.addPossibleCollectors([collector1]);
+      return collectorUtils.createGenerator(
+        genWithThreeCollectors, null, [collector1, collector2, collector3], collector1
+      );
     })
-    .then(() => Generator.create(genWithThreeCollectors))
     .then((gen) => {
       genWithThreeCollectors.id = gen.id;
-      return gen.addPossibleCollectors([collector1, collector2, collector3]);
+      return done();
     })
-    .then(() => done())
     .catch(done);
   });
 

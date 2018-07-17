@@ -272,6 +272,22 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
     });
 
     describe('generator changes >', () => {
+      // const now = Date.now();
+      // let clock;
+      // beforeEach(() => {
+      //   clock = sinon.useFakeTimers(now);
+      // });
+
+      // before((done) => {
+      //   tu.db.Generator.destroy({ where: { name: generator.name }, force: true })
+
+      //   // creates alive and running collector
+      //   .then(() => tu.db.Collector.create(collector4))
+      //   .then(() => done())
+      //   .catch(done);
+      // });
+
+      // afterEach(() => clock.restore());
       // reset the tracked changes
       beforeEach((done) => {
         Promise.resolve()
@@ -332,6 +348,7 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
           .then(() => u.createGenerator(generator1, userId, collector1))
           .then(() => u.sendHeartbeat(collector1, collectorTokens))
           .then((res) => {
+            // console.log(res);
             u.expectLengths({ added: 1, deleted: 0, updated: 0 }, res);
             expect(res.body.generatorsAdded[0].aspects[0])
               .to.contain.property('name', 'temperature');
@@ -353,9 +370,9 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
         it('update move', (done) => {
           Promise.resolve()
           .then(() => u.createGenerator(generator1, userId, collector1))
-          .then(() => u.sendHeartbeat(collector1, collectorTokens))
+          .then((createdGen) => u.sendHeartbeat(collector1, collectorTokens))
           .then(() => u.updateGenerator(generator1, userToken, collector2))
-          .then(() => u.sendHeartbeat(collector1, collectorTokens))
+          .then((updatedGen) => u.sendHeartbeat(collector1, collectorTokens))
           .then((res) => u.expectLengths({ added: 0, deleted: 1, updated: 0 }, res))
           .then(() => u.sendHeartbeat(collector2, collectorTokens))
           .then((res) => u.expectLengths({ added: 1, deleted: 0, updated: 0 }, res))
@@ -806,7 +823,7 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
           const reencryptedSG = res.body.generatorsAdded[0];
           expect(reencryptedSG).to.not.equal(undefined);
           expect(reencryptedSG.context.secretInformation)
-          .to.not.equal(encryptedSG.secretInformation);
+          .to.not.equal(encryptedSG.context.secretInformation);
           expect(reencryptedSG.context.otherNonSecretInformation)
           .equal(otherNonSecretInformation);
 

@@ -17,6 +17,7 @@ const u = require('../helpers/collectorUtils');
 const assoc = {};
 const collectorConfig = require('../../config/collectorConfig');
 const MS_PER_SEC = 1000;
+const collectorStatus = constants.collectorStatuses;
 
 module.exports = function collector(seq, dataTypes) {
   const Collector = seq.define('Collector', {
@@ -102,18 +103,36 @@ module.exports = function collector(seq, dataTypes) {
         return common.setIsDeleted(seq.Promise, inst);
       }, // beforeDestroy
 
-      afterCreate(inst /* , opts*/) {
-        // Add createdBy user to Collector writers.
-        if (inst.createdBy) {
-          return new seq.Promise((resolve, reject) =>
-            inst.addWriter(inst.createdBy)
-            .then(() => resolve(inst))
-            .catch((err) => reject(err))
-          );
-        }
-
-        return inst;
+      beforeCreate(/* inst , opts*/) {
+        return seq.models.Generator.findAll(
+          { where: { currentCollector: null, isActive: true } }
+        )
+        .then((unassignedGenerators) =>
+          Promise.all(unassignedGenerators.map((g) => {
+            g.assignToCollector();
+            return g.save();
+          })
+        ));
       }, // hooks.beforeCreate
+
+      afterCreate(inst /* , opts*/) {
+        return Promise.all([
+          Promise.resolve()
+          .then(() => {
+            // Add createdBy user to Collector writers.
+            if (inst.createdBy) {
+              return new seq.Promise((resolve, reject) =>
+                inst.addWriter(inst.createdBy)
+                .then(() => resolve(inst))
+                .catch((err) => reject(err))
+              );
+            }
+
+            return Promise.resolve();
+          }),
+          u.findAndAssignGenerators(seq),
+        ]);
+      }, // hooks.afterCreate
 
       beforeUpdate(inst /* , opts */) {
         // Invalid status transition: [Stopped --> Paused]
@@ -123,7 +142,26 @@ module.exports = function collector(seq, dataTypes) {
             'This collector cannot be paused because it is not running.';
           throw new ValidationError(msg);
         }
+
+        return inst;
       }, // hooks.beforeUpdate
+
+      afterUpdate(inst /* , opts */) {
+        /* if status is changed to Running, then find and assign unassigned
+         generators */
+        if (inst.changed('status')) {
+          if (inst.status === collectorStatus.Running) {
+            return u.findAndAssignGenerators(seq);
+          } else if (inst.status === collectorStatus.Stopped ||
+            inst.status === collectorStatus.Paused) {
+            /* if status is changed to Stopped or Paused, then reassign the
+             generators which were assigned to this collector */
+            return inst.reassignGenerators();
+          }
+        }
+
+        return inst;
+      }, // afterUpdate
     }, // hooks
     indexes: [
       {

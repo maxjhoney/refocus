@@ -23,6 +23,7 @@ const expect = require('chai').expect;
 const Generator = tu.db.Generator;
 const GeneratorTemplate = tu.db.GeneratorTemplate;
 const sgUtils = require('../generators/utils');
+const sinon = require('sinon');
 const gtUtil = sgUtils.gtUtil;
 
 describe('tests/api/v1/collectors/start.js >', () => {
@@ -35,6 +36,7 @@ describe('tests/api/v1/collectors/start.js >', () => {
 
   let generator1;
   let generator2;
+  let collector1;
   const generatorTemplate = gtUtil.getGeneratorTemplate();
 
   before((done) => {
@@ -74,7 +76,10 @@ describe('tests/api/v1/collectors/start.js >', () => {
       generator2 = generators[1];
       return Collector.create(u.getCollectorToCreate());
     })
-    .then((c) => c.addPossibleGenerators([generator1, generator2]))
+    .then((c) => {
+      collector1 = c;
+      return c.addPossibleGenerators([generator1, generator2]);
+    })
     .then(() => done())
     .catch((err) => {
       console.error(err);
@@ -97,7 +102,6 @@ describe('tests/api/v1/collectors/start.js >', () => {
           return done(err);
         }
 
-        console.log(res.body)
         expect(res.body.status).to.equal('Running');
         expect(res.body.token).to.be.an('string');
         expect(res.body.collectorConfig).to.include(collectorConfig);
@@ -128,6 +132,51 @@ describe('tests/api/v1/collectors/start.js >', () => {
           .to.equal('Authentication Failed');
       })
       .end(done);
+    });
+  });
+
+  describe('with unassigned and active generators available', () => {
+    let clock;
+    const now = Date.now();
+
+    // used to make collector alive
+    before(() => {
+      clock = sinon.useFakeTimers(now);
+    });
+
+    afterEach(() => clock.restore());
+
+    it('starting collector assigns this collector to unassigned and active ' +
+      'generators with this possible collector', (done) => {
+      const gen3 = sgUtils.getGenerator();
+      gen3.name += 'generator-3';
+      gen3.createdBy = user.id;
+      gen3.isActive = true;
+      gen3.possibleCollectors = [collector1.name];
+      sgUtils.createSGtoSGTMapping(generatorTemplate, gen3);
+
+      Generator.createWithCollectors(gen3)
+      .then(() => {
+        api.post(path)
+        .set('Authorization', token)
+        .send(defaultCollector)
+        .expect(constants.httpStatus.OK)
+        .end((err, res) => {
+          if (err) {
+            return done(err);
+          }
+
+          expect(res.body.status).to.equal('Running');
+          return Generator.find({ where: { name: gen3.name } })
+          .then((gen) => {
+            // gen3 currentCollector set to defaultCollector
+            expect(gen.currentCollector).to.be.equal(defaultCollector.name);
+            return done();
+          })
+          .catch(done);
+        });
+      })
+      .catch(done);
     });
   });
 

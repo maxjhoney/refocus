@@ -161,14 +161,26 @@ module.exports = function generator(seq, dataTypes) {
               .catch(() => {
                 throw new dbErrors.SampleGeneratorContextEncryptionError();
               });
-          });
+          })
+          .then(() => inst.assignToCollector());
       }, // beforeCreate
 
       beforeUpdate(inst /* , opts */) {
         const gtName = inst.generatorTemplate.name;
         const gtVersion = inst.generatorTemplate.version;
+
         if (inst.changed('isActive')) {
           inst.assignToCollector();
+        }
+
+        if (inst.possibleCollectors && inst.changed('possibleCollectors')) {
+          const isCurrentCollectorIncluded = inst.possibleCollectors.some(
+            (coll) => coll.name === inst.currentCollector
+          );
+
+          if (!isCurrentCollectorIncluded) {
+            inst.assignToCollector();
+          }
         }
 
         if (inst.changed('generatorTemplate') || inst.changed('context')) {
@@ -212,9 +224,12 @@ module.exports = function generator(seq, dataTypes) {
       }, // afterCreate
 
       afterUpdate(inst) {
-        let oldCollector = inst.previous('currentCollector');
-        let newCollector = inst.get('currentCollector');
-        return hbUtils.trackGeneratorChanges(inst, oldCollector, newCollector);
+        const oldCollector = inst.previous('currentCollector');
+        const newCollector = inst.get('currentCollector');
+
+        return Promise.all([
+          hbUtils.trackGeneratorChanges(inst, oldCollector, newCollector),
+        ]);
       }, //afterUpdate
     },
     validate: {
@@ -271,6 +286,7 @@ module.exports = function generator(seq, dataTypes) {
       as: 'possibleCollectors',
       through: 'GeneratorCollectors',
       foreignKey: 'generatorId',
+      // hooks: true,
     });
 
     assoc.currentCollector = Generator.belongsTo(models.Collector, {
@@ -392,7 +408,11 @@ module.exports = function generator(seq, dataTypes) {
     .then(() => createdGenerator.save())
     .then((gen) => createdGenerator = gen)
     .then(() => createdGenerator.addPossibleCollectors(collectors))
-    .then(() => createdGenerator.reload());
+    .then(() => createdGenerator.reload())
+    .then((returnedObj) => {
+      // console.log("returnedObj>>>", returnedObj);
+      return returnedObj;
+    });
   };
 
   Generator.findForHeartbeat = function (findOpts) {
@@ -465,9 +485,10 @@ module.exports = function generator(seq, dataTypes) {
    * currentCollector field and expects the caller to save later.
    */
   Generator.prototype.assignToCollector = function () {
-    if (this.isActive && this.possibleCollectors && this.possibleCollectors.length) {
-      this.possibleCollectors.sort((c1, c2) => c1.name > c2.name);
-      const newColl = this.possibleCollectors.find((c) => c.isRunning() && c.isAlive());
+    const instCollectors = this.possibleCollectors;
+    if (this.isActive && instCollectors && instCollectors.length) {
+      instCollectors.sort((c1, c2) => c1.name > c2.name);
+      const newColl = instCollectors.find((c) => c.isRunning() && c.isAlive());
       this.currentCollector = newColl ? newColl.name : null;
     } else {
       this.currentCollector = null;

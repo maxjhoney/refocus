@@ -163,6 +163,7 @@ module.exports = {
    * POST /generators/{key}
    *
    * Modifies the generator and sends it back in the response.
+   * Assign the generator to collector.
    *
    * @param {IncomingMessage} req - The request object
    * @param {ServerResponse} res - The response object
@@ -178,7 +179,6 @@ module.exports = {
     validateGeneratorAspectsPermissions(toPost.aspects, req)
     .then(() =>
       helper.model.createWithCollectors(toPost))
-    .then((o) => o.reload())
     .then((o) => {
       resultObj.dbTime = new Date() - resultObj.reqStartTime;
       u.sortArrayObjectsByField(helper, o); // order collectors by name
@@ -205,7 +205,6 @@ module.exports = {
     const puttableFields =
       req.swagger.params.queryBody.schema.schema.properties;
     let instance;
-    let collectors = [];
 
     /*
      * Find the instance, then update it.
@@ -220,15 +219,23 @@ module.exports = {
       return helper.model.validateCollectors(toPut.possibleCollectors);
     })
     .then((_collectors) => {
-      collectors = _collectors;
-      return u.updateInstance(instance, puttableFields, toPut);
+      /*
+       Here is an attempt to save multiple db calls:
+       Set the collectors value in place so that
+       inst.changed('possibleCollectors') resolves to true in beforeUpdate hook
+       of generator model. This enables us to use assignToCollector in db hooks
+       instead of api layer. Also, using setPossibleCollectors before
+       updateInstance saves us a call to reload the instance to reflect
+       updated collectors.
+       */
+      instance.set('possibleCollectors', _collectors);
+      instance.changed('possibleCollectors', true);
+      return instance.setPossibleCollectors(_collectors);
     })
-    .then((_updatedInstance) => {
-      instance = _updatedInstance;
-      return instance.setPossibleCollectors(collectors);
-    }) // need reload instance to attach associations
-    .then(() => instance.reload())
-    .then((retVal) => u.handleUpdatePromise(resultObj, req, retVal, helper, res))
+    .then(() => u.updateInstance(instance, puttableFields, toPut))
+    .then((retVal) =>
+      u.handleUpdatePromise(resultObj, req, retVal, helper, res)
+    )
     .catch((err) => u.handleError(next, err, helper.modelName));
   },
 
