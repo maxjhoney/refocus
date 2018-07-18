@@ -173,6 +173,9 @@ module.exports = function generator(seq, dataTypes) {
           inst.assignToCollector();
         }
 
+        /* If possibleCollectors are changed and this generator current
+         collector is not included in the changed possibleCollectors, then
+         assign this generator to another collector */
         if (inst.possibleCollectors && inst.changed('possibleCollectors')) {
           const isCurrentCollectorIncluded = inst.possibleCollectors.some(
             (coll) => coll.name === inst.currentCollector
@@ -226,10 +229,7 @@ module.exports = function generator(seq, dataTypes) {
       afterUpdate(inst) {
         const oldCollector = inst.previous('currentCollector');
         const newCollector = inst.get('currentCollector');
-
-        return Promise.all([
-          hbUtils.trackGeneratorChanges(inst, oldCollector, newCollector),
-        ]);
+        return hbUtils.trackGeneratorChanges(inst, oldCollector, newCollector);
       }, //afterUpdate
     },
     validate: {
@@ -485,10 +485,10 @@ module.exports = function generator(seq, dataTypes) {
    * currentCollector field and expects the caller to save later.
    */
   Generator.prototype.assignToCollector = function () {
-    const instCollectors = this.possibleCollectors;
-    if (this.isActive && instCollectors && instCollectors.length) {
-      instCollectors.sort((c1, c2) => c1.name > c2.name);
-      const newColl = instCollectors.find((c) => c.isRunning() && c.isAlive());
+    const possibleCollectors = this.possibleCollectors;
+    if (this.isActive && possibleCollectors && possibleCollectors.length) {
+      possibleCollectors.sort((c1, c2) => c1.name > c2.name);
+      const newColl = possibleCollectors.find((c) => c.isRunning() && c.isAlive());
       this.currentCollector = newColl ? newColl.name : null;
     } else {
       this.currentCollector = null;

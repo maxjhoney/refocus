@@ -73,13 +73,20 @@ describe('tests/api/v1/generators/getWithCollector.js >', () => {
     .then(() => Generator.create(genWithNoCollector))
     .then((gen) => {
       genWithNoCollector.id = gen.id;
-      return collectorUtils.createGenerator(genWithOneCollector, null, collector1);
+
+      genWithOneCollector.isActive = true;
+      genWithOneCollector.currentCollector = collector1.name;
+      genWithOneCollector.possibleCollectors = [collector1.name];
+      return Generator.createWithCollectors(genWithOneCollector);
     })
     .then((gen) => {
       genWithOneCollector.id = gen.id;
-      return collectorUtils.createGenerator(
-        genWithThreeCollectors, null, [collector1, collector2, collector3], collector1
-      );
+
+      genWithThreeCollectors.isActive = true;
+      genWithThreeCollectors.currentCollector = collector1.name;
+      genWithThreeCollectors.possibleCollectors =
+        [collector1.name, collector2.name, collector3.name];
+      return Generator.createWithCollectors(genWithThreeCollectors);
     })
     .then((gen) => {
       genWithThreeCollectors.id = gen.id;

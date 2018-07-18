@@ -18,7 +18,6 @@ const doFind = require('../helpers/verbs/doFind');
 const doGet = require('../helpers/verbs/doGet');
 const doGetWriters = require('../helpers/verbs/doGetWriters');
 const u = require('../helpers/verbs/utils');
-const heartbeatUtils = require('../helpers/verbs/heartbeatUtils');
 const constants = require('../constants');
 const Aspect = require('../helpers/nouns/aspects').model;
 const apiErrors = require('../apiErrors');
@@ -223,9 +222,9 @@ module.exports = {
        Here is an attempt to save multiple db calls:
        Set the collectors value in place so that
        inst.changed('possibleCollectors') resolves to true in beforeUpdate hook
-       of generator model. This enables us to use assignToCollector in db hooks
-       instead of api layer. Also, using setPossibleCollectors before
-       updateInstance saves us a call to reload the instance to reflect
+       of generator db model. This enables us to use assignToCollector in db
+       hooks instead of api layer. Also, using setPossibleCollectors before
+       updateInstance saves us an extra call to reload the instance to reflect
        updated collectors.
        */
       instance.set('possibleCollectors', _collectors);

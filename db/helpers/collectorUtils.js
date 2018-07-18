@@ -83,7 +83,7 @@ function validateVersion(version) {
 }
 
 /**
- * Find unassigned generators and assign them
+ * Find unassigned generators and assign them.
  * @param {Object} seq - Sequelize object
  * @returns {Promise} - Resolves to array of assigned generator db objects
  */
