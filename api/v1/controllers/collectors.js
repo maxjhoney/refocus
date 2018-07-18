@@ -411,10 +411,11 @@ function startCollector(req, res, next) {
     collToReturn = coll;
     /* TODO: change to use currentGenerators once that includes current gens only */
 
-    return Generator.findAll({ where: { currentCollector: coll.name } });
+    // return Generator.findAll({ where: { currentCollector: coll.name } });
+    return Promise.all(coll.currentGenerators.map((g) => g.updateForHeartbeat()))
   })
   /* Add all the attributes necessary to send back to collector. */
-  .then((gens) => Promise.all(gens.map((g) => g.updateForHeartbeat())))
+  // .then((gens) => Promise.all(gens.map((g) => g.updateForHeartbeat())))
   .then((gens) => {
     resultObj.dbTime = new Date() - resultObj.reqStartTime;
     collToReturn.dataValues.generatorsAdded = gens.map((g) => {

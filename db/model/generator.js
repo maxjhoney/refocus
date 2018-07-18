@@ -327,6 +327,19 @@ module.exports = function generator(seq, dataTypes) {
             'updatedAt',
           ],
         },
+        {
+          association: assoc.currentCollector,
+          attributes: [
+            'id',
+            'name',
+            'registered',
+            'status',
+            'lastHeartbeat',
+            'isDeleted',
+            'createdAt',
+            'updatedAt',
+          ],
+        },
       ],
       order: ['name'],
     }, {
@@ -489,7 +502,7 @@ module.exports = function generator(seq, dataTypes) {
     if (this.isActive && possibleCollectors && possibleCollectors.length) {
       possibleCollectors.sort((c1, c2) => c1.name > c2.name);
       const newColl = possibleCollectors.find((c) => c.isRunning() && c.isAlive());
-      this.currentCollector = newColl ? newColl.name : null;
+      this.currentCollector = newColl || null;
     } else {
       this.currentCollector = null;
     }

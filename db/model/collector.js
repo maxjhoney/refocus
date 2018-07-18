@@ -97,6 +97,21 @@ module.exports = function collector(seq, dataTypes) {
   }, {
     defaultScope: {
       order: ['name'],
+      include: [
+        {
+          association: assoc.currentGenerators,
+          // attributes: [
+          //   'id',
+          //   'name',
+          //   'registered',
+          //   'status',
+          //   'lastHeartbeat',
+          //   'isDeleted',
+          //   'createdAt',
+          //   'updatedAt',
+          // ],
+        },
+      ]
     },
     hooks: {
       beforeDestroy(inst /* , opts */) {
@@ -217,8 +232,9 @@ module.exports = function collector(seq, dataTypes) {
 
   Collector.postImport = function (models) {
 
-    // This field is not currently needed by collector, but table already exists
-    // because generator needs to access its possible collectors.
+    // This field is not currently needed by collector, but 'GeneratorCollector' 
+    // table already exists because generators have a many-to-many association
+    // with possibleCollectors.
     assoc.possibleGenerators = Collector.belongsToMany(models.Generator, {
       as: 'possibleGenerators',
       through: 'GeneratorCollectors',
@@ -288,8 +304,7 @@ module.exports = function collector(seq, dataTypes) {
    */
   Collector.prototype.reassignGenerators = function () {
     /* TODO: change to use currentGenerators once that includes current gens only */
-    return seq.models.Generator.findAll({ where: { currentCollector: this.name } })
-    .map((g) => {
+    return this.currentGenerators.map((g) => {
       g.assignToCollector();
       return g.save();
     });
