@@ -155,9 +155,9 @@ describe('tests/db/model/collector/methods.js >', () => {
         clock = sinon.useFakeTimers(fakeNow);
         collectorConfig.heartbeatLatencyToleranceMillis = threshold;
 
-        // checkMissedHeartbeat identifies collector2 as dead because more than
-        // 3000ms has passed since lastHeartbeat (sinon used to fake time).
-        // As a result, generator2 is reassigned to collector3.
+        /* checkMissedHeartbeat identifies collector2 as dead because more than
+         3000ms has passed since lastHeartbeat (sinon used to fake time).
+         As a result, generator2 is reassigned to collector3. */
         return Collector.checkMissedHeartbeat()
         .then(() => Promise.join(
           Generator.find({ where: { name: generator1.name } }),
@@ -231,6 +231,7 @@ describe('tests/db/model/collector/methods.js >', () => {
     });
 
     describe('reassignGenerators >', () => {
+      // check checkMissedHeartbeat test for comments
       beforeEach(() => GeneratorTemplate.create(generatorTemplate)
         .then((gt1) => generatorTemplate.id = gt1.id)
         .then(() => Promise.join(

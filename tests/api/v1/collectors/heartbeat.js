@@ -401,7 +401,6 @@ describe('tests/api/v1/collectors/heartbeat.js >', () => {
           .then((res) => u.expectLengths({ added: 1, deleted: 0, updated: 0 }, res))
           .then(done).catch(done);
         });
-
       });
 
       describe('basic changes to multiple generators >', () => {
