@@ -65,7 +65,6 @@ describe('tests/db/model/generator/methods.js >', () => {
       // coll1.id = _coll1.id;
       // coll2.id = _coll2.id;
       // coll3.id = _coll3.id;
-      console.log(_gen1)
       generator1 = _gen1;
       collector1 = _coll1;
       collector2 = _coll2;
@@ -97,7 +96,7 @@ describe('tests/db/model/generator/methods.js >', () => {
       // .then(() => Generator.findById(gen1.id))
       .then(() => {
         debugger;
-        // console.log(generator1)
+        console.log(generator1.collectorId);
         expect(generator1.currentCollector.name).to.equal(collector2.name);
         expect(generator1.currentCollector.id).to.equal(collector2.id);
         done()
@@ -167,7 +166,6 @@ describe('tests/db/model/generator/methods.js >', () => {
         Collector.findById(coll3.id),
       ))
       .spread((coll2, gen1, coll3) => {
-        console.log(gen1)
         return gen1.setCurrentCollector(coll3)
       })
       .then(() => Generator.findById(gen1.id))
