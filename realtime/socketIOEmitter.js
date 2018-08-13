@@ -14,6 +14,7 @@ const rtUtils = require('./utils');
 const initPerspectiveEvent =
   'refocus.internal.realtime.perspective.namespace.initialize';
 const initBotEvent = 'refocus.internal.realtime.bot.namespace.initialize';
+const connectedNamespaces = require('./connectedNamespaces');
 
 module.exports = (io, key, obj, pubOpts) => {
   // newObjectAsString contains { key: {new: obj }}
@@ -36,7 +37,8 @@ module.exports = (io, key, obj, pubOpts) => {
    * this real-time event to the perspectives/rooms to which it should be
    * emitted.
    */
-  Object.keys(io.nsps).forEach((n) => {
+  console.log('All connected namespaces: ', connectedNamespaces.nspStrings);
+  connectedNamespaces.nspStrings.forEach((n) => {
     const namespace = io.of(n); // Load the namespace from socket.io
 
     /*
@@ -46,12 +48,13 @@ module.exports = (io, key, obj, pubOpts) => {
      *
      * Ref. https://socket.io/docs/server-api/#namespace-connected.
      */
-    const connections = Object.keys(namespace.connected);
-    if (connections.length > 0) {
+    // const connections = Object.keys(namespace.connected);
+    // if (connections.length > 0) {
       /* Check the perspective/room filters before emitting. */
       if (rtUtils.shouldIEmitThisObj(n, obj, pubOpts)) {
+        console.log('Emitting for namespace: ', n);
         namespace.emit(key, newObjectAsString);
       }
-    }
+    // }
   });
 };

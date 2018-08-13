@@ -63,7 +63,8 @@ function setupNamespace(io) {
     .map((p) => rtUtils.initializePerspectiveNamespace(p, io));
   const roomPromise = room.scope('namespace').findAll()
     .map((r) => rtUtils.initializeBotNamespace(r, io));
-  return Promise.all([perspPromise, roomPromise]);
+  return Promise.all([perspPromise, roomPromise])
+  .then(() => rtUtils.addEventsForNamespaces(io));
 } // setupNamespace
 
 /**
