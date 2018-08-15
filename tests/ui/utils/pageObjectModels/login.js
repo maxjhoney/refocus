@@ -10,7 +10,7 @@
  * tests/ui/utils/pageObjectModels/login.js
  */
 
-loginErrorLabelId = 'errorInfo';
+const loginErrorLabelId = 'errorInfo';
 
 module.exports = {
   loginErrorLabelId,

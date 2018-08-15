@@ -10,7 +10,7 @@
  * tests/ui/utils/pageObjectModels/room.js
  */
 
-subTitleId = 'subTitle';
+const subTitleId = 'subTitle';
 
 module.exports = {
   subTitleId,
