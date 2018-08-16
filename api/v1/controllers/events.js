@@ -37,6 +37,10 @@ module.exports = {
     doFind(req, res, next, helper);
   },
 
+  searchEvents(req, res, next) {
+    console.log("hereeeee");
+  }
+
   /**
    * GET /events/{key}
    *

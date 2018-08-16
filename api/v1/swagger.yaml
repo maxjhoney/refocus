@@ -3278,6 +3278,81 @@ paths:
           $ref: "#/responses/genericError"
 
   # ---------------------------------------------------------------------------
+  /events/search:
+    x-swagger-router-controller: events
+    get:
+      security:
+        - jwt: []
+      summary: Search events
+      tags: [ events ]
+      operationId: searchEvents
+      description: >-
+        All events are retrieved using this route and using the paramaters as filters you can focus on rooms, bots, or users.
+      parameters:
+        -
+          name: queryBody
+          in: body
+          required: true
+          schema:
+            type: object
+            description: >
+              Credentials of person who interacts with the Refocus system.
+            properties:
+              roomId:
+                type: integer
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              botId:
+                type: string
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              botDataId:
+                type: string
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              botActionId:
+                type: string
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              userId:
+                type: string
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              context:
+                type: object
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              sort:
+                type: string
+                required: false
+                description: >
+                  The User name provided by the user during registeration
+              $ref: "#/parameters/limitParam"
+              $ref: "#/parameters/offsetParam"
+      responses:
+        200:
+          description: >-
+            Success, returns all Events
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/EventResponse"
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
   /generators:
     x-swagger-router-controller: generators
     get:
