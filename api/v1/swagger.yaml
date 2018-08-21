@@ -1693,6 +1693,187 @@ paths:
           $ref: "#/responses/genericError"
 
   # ---------------------------------------------------------------------------
+  /botActions/{key}/writers:
+    x-swagger-router-controller: botActions
+    delete:
+      security:
+        - jwt: []
+      summary: Delete botAction's writers
+      tags: [ botActions ]
+      description: >-
+        Remove all users from a botAction's list of authorized writers.
+      operationId: deleteBotActionWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+             The id or name of the botAction.
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The botAction is no longer write-protected.
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    get:
+      security:
+        - jwt: []
+      summary: Get botAction writers
+      tags: [ botActions ]
+      description: >-
+        Returns a list of users permitted to modify this botAction. DOES NOT
+        use wildcards.
+      operationId: getBotActionWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botAction for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >-
+            Success, returns The users having write permission to the botAction
+            metadata.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UsersResponse"
+              description: >-
+                The users having write permission to the botAction metadata.
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      security:
+        - jwt: []
+      summary: Add botActions writer
+      tags: [ botActions ]
+      description: >-
+         Add one or more users to a botAction's list of authorized writers.
+      operationId: postBotActionWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botAction for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+        -
+          name: queryBody
+          description: Request body.
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            description: >
+              User name or id
+      responses:
+        201:
+          description: >-
+            One or more of the valid users were added to the list of authorized
+            writers.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/BotActionWriterResponse"
+              description: >-
+                The users who have write permission to the botAction metadata.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+            $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
+  /botActions/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: botActions
+    get:
+      security:
+        - jwt: []
+      tags: [ botAction ]
+      summary: Get botAction's writers
+      description: >-
+        Determine whether a user is an authorized writer for a botAction.
+        If user is unauthorized, there is no writer by this name for this
+        botAction.
+      operationId: getBotActionWriter
+      parameters:
+      -
+        name: key
+        in: path
+        description: The id or name of the botAction
+        required: true
+        type: string
+      - name: userNameOrId
+        in: "path"
+        description: The id or name of the user
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success, return authorized user
+          schema:
+            $ref: "#/definitions/UsersResponse"
+        404:
+          description: userNameOrId does not identify a User
+    delete:
+      security:
+        - jwt: []
+      summary: Delete botAction writer
+      tags: [ botAction ]
+      description: >-
+        Remove a user from a botAction's list of authorized writers.
+      operationId: deleteBotActionWriter
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botAction
+          required: true
+          type: string
+        -
+          name: userNameOrId
+          in: path
+          description: >-
+            The username or the Id of the user
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The user’s write permission has been revoked for the botAction.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+  # ---------------------------------------------------------------------------
   /botData:
     x-swagger-router-controller: botData
     get:
@@ -1982,6 +2163,188 @@ paths:
         default:
           $ref: "#/responses/genericError"
 
+  # ---------------------------------------------------------------------------
+  /botData/{key}/writers:
+    x-swagger-router-controller: botData
+    delete:
+      security:
+        - jwt: []
+      summary: Delete botData writers
+      tags: [ botData ]
+      description: >-
+        Remove all users from a botData's list of authorized writers.
+      operationId: deleteBotDataWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+             The id or name of the botData.
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The botData is no longer write-protected.
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    get:
+      security:
+        - jwt: []
+      summary: Get botData writers
+      tags: [ botData ]
+      description: >-
+        Returns a list of users permitted to modify this botData. DOES NOT
+        use wildcards.
+      operationId: getBotDataWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botData for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >-
+            Success, returns The users having write permission to the botData
+            metadata.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UsersResponse"
+              description: >-
+                The users having write permission to the botData metadata.
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      security:
+        - jwt: []
+      summary: Add botData writer
+      tags: [ botData ]
+      description: >-
+         Add one or more users to a botData's list of authorized writers.
+      operationId: postBotDataWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botData for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+        -
+          name: queryBody
+          description: Request body.
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            description: >
+              User name or id
+      responses:
+        201:
+          description: >-
+            One or more of the valid users were added to the list of authorized
+            writers.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/BotDataWriterResponse"
+              description: >-
+                The users who have write permission to the botData metadata.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+            $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
+
+  /botData/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: botData
+    get:
+      security:
+        - jwt: []
+      tags: [ botData ]
+      summary: Get botData's writers
+      description: >-
+        Determine whether a user is an authorized writer for a botData.
+        If user is unauthorized, there is no writer by this name for this
+        botData.
+      operationId: getBotDataWriter
+      parameters:
+      -
+        name: key
+        in: path
+        description: The id or name of the botData
+        required: true
+        type: string
+      - name: userNameOrId
+        in: "path"
+        description: The id or name of the user
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success, return authorized user
+          schema:
+            $ref: "#/definitions/UsersResponse"
+        404:
+          description: userNameOrId does not identify a User
+    delete:
+      security:
+        - jwt: []
+      summary: Delete botData writer
+      tags: [ collectors ]
+      description: >-
+        Remove a user from a botData's list of authorized writers.
+      operationId: deleteBotDataWriter
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the botData
+          required: true
+          type: string
+        -
+          name: userNameOrId
+          in: path
+          description: >-
+            The username or the Id of the user
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The user’s write permission has been revoked for the botData.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
   # ---------------------------------------------------------------------------
   /bots:
     x-swagger-router-controller: bots
@@ -2369,6 +2732,189 @@ paths:
           $ref: "#/responses/403"
         404:
             $ref: "#/responses/404"
+  # ---------------------------------------------------------------------------
+
+  /bots/{key}/writers:
+    x-swagger-router-controller: bots
+    delete:
+      security:
+        - jwt: []
+      summary: Delete bot writers
+      tags: [ bots ]
+      description: >-
+        Remove all users from a bot's list of authorized writers.
+      operationId: deleteBotWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+             The id or name of the bot.
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The bot is no longer write-protected.
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    get:
+      security:
+        - jwt: []
+      summary: Get bot writers
+      tags: [ bots ]
+      description: >-
+        Returns a list of users permitted to modify this bot. DOES NOT
+        use wildcards.
+      operationId: getBotWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the bot for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >-
+            Success, returns The users having write permission to the bot
+            metadata.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UsersResponse"
+              description: >-
+                The users having write permission to the bot metadata.
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      security:
+        - jwt: []
+      summary: Add bots writer
+      tags: [ bots ]
+      description: >-
+         Add one or more users to a bot's list of authorized writers.
+      operationId: postBotWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the bot for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+        -
+          name: queryBody
+          description: Request body.
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            description: >
+              User name or id
+      responses:
+        201:
+          description: >-
+            One or more of the valid users were added to the list of authorized
+            writers.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/BotWriterResponse"
+              description: >-
+                The users who have write permission to the bot metadata.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+            $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
+
+  /collectors/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: collectors
+    get:
+      security:
+        - jwt: []
+      tags: [ collectors ]
+      summary: Get collector writers
+      description: >-
+        Determine whether a user is an authorized writer for a Collector.
+        If user is unauthorized, there is no writer by this name for this
+        collector.
+      operationId: getCollectorWriter
+      parameters:
+      -
+        name: key
+        in: path
+        description: The id or name of the collector
+        required: true
+        type: string
+      - name: userNameOrId
+        in: "path"
+        description: The id or name of the user
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success, return authorized user
+          schema:
+            $ref: "#/definitions/UsersResponse"
+        404:
+          description: userNameOrId does not identify a User
+    delete:
+      security:
+        - jwt: []
+      summary: Delete collector writer
+      tags: [ collectors ]
+      description: >-
+        Remove a user from a collector’s list of authorized writers.
+      operationId: deleteCollectorWriter
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the collector
+          required: true
+          type: string
+        -
+          name: userNameOrId
+          in: path
+          description: >-
+            The username or the Id of the user
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The user’s write permission has been revoked for the collector.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
 
   # ---------------------------------------------------------------------------
   /collectors:
@@ -3044,23 +3590,23 @@ paths:
 
   # ---------------------------------------------------------------------------
 
-  /collectors/{key}/writers/{userNameOrId}:
-    x-swagger-router-controller: collectors
+  /bots/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: bots
     get:
       security:
         - jwt: []
-      tags: [ collectors ]
-      summary: Get collector writers
+      tags: [ bots ]
+      summary: Get bots writers
       description: >-
-        Determine whether a user is an authorized writer for a Collector.
+        Determine whether a user is an authorized writer for a Bot.
         If user is unauthorized, there is no writer by this name for this
-        collector.
-      operationId: getCollectorWriter
+        bot.
+      operationId: getBotWriter
       parameters:
       -
         name: key
         in: path
-        description: The id or name of the collector
+        description: The id or name of the bot
         required: true
         type: string
       - name: userNameOrId
@@ -3078,17 +3624,17 @@ paths:
     delete:
       security:
         - jwt: []
-      summary: Delete collector writer
+      summary: Delete bot writer
       tags: [ collectors ]
       description: >-
-        Remove a user from a collector’s list of authorized writers.
-      operationId: deleteCollectorWriter
+        Remove a user from a bot's list of authorized writers.
+      operationId: deleteBotWriter
       parameters:
         -
           name: key
           in: path
           description: >-
-            The id or name of the collector
+            The id or name of the bot
           required: true
           type: string
         -
@@ -3101,7 +3647,7 @@ paths:
       responses:
         204:
           description: >-
-            The user’s write permission has been revoked for the collector.
+            The user’s write permission has been revoked for the bot.
         400:
           $ref: "#/responses/400"
         403:
@@ -3132,12 +3678,6 @@ paths:
         -
           name: botId
           description: Get events from specific bot
-          in: query
-          required: false
-          type: string
-        -
-          name: type
-          description: Get events that are a specific type
           in: query
           required: false
           type: string
@@ -6838,6 +7378,188 @@ paths:
           $ref: "#/responses/genericError"
 
   # ---------------------------------------------------------------------------
+  /rooms/{key}/writers:
+    x-swagger-router-controller: rooms
+    delete:
+      security:
+        - jwt: []
+      summary: Delete room's writers
+      tags: [ rooms ]
+      description: >-
+        Remove all users from a room's list of authorized writers.
+      operationId: deleteRoomWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+             The id or name of the room.
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The room is no longer write-protected.
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    get:
+      security:
+        - jwt: []
+      summary: Get room writers
+      tags: [ room ]
+      description: >-
+        Returns a list of users permitted to modify this room. DOES NOT
+        use wildcards.
+      operationId: getRoomWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the room for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >-
+            Success, returns the users having write permission to the room
+            metadata.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UsersResponse"
+              description: >-
+                The users having write permission to the room metadata.
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      security:
+        - jwt: []
+      summary: Add rooms writer
+      tags: [ rooms ]
+      description: >-
+         Add one or more users to a room's list of authorized writers.
+      operationId: postRoomWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the room for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+        -
+          name: queryBody
+          description: Request body.
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            description: >
+              User name or id
+      responses:
+        201:
+          description: >-
+            One or more of the valid users were added to the list of authorized
+            writers.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/RoomWriterResponse"
+              description: >-
+                The users who have write permission to the room metadata.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+            $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
+  /rooms/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: rooms
+    get:
+      security:
+        - jwt: []
+      tags: [ room ]
+      summary: Get room's writers
+      description: >-
+        Determine whether a user is an authorized writer for a room.
+        If user is unauthorized, there is no writer by this name for this
+        room.
+      operationId: getRoomWriter
+      parameters:
+      -
+        name: key
+        in: path
+        description: The id or name of the room
+        required: true
+        type: string
+      - name: userNameOrId
+        in: "path"
+        description: The id or name of the user
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success, return authorized user
+          schema:
+            $ref: "#/definitions/UsersResponse"
+        404:
+          description: userNameOrId does not identify a User
+    delete:
+      security:
+        - jwt: []
+      summary: Delete room writer
+      tags: [ rooms ]
+      description: >-
+        Remove a user from a room's list of authorized writers.
+      operationId: deleteRoomWriter
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the room
+          required: true
+          type: string
+        -
+          name: userNameOrId
+          in: path
+          description: >-
+            The username or the Id of the user
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The user’s write permission has been revoked for the room.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+  # ---------------------------------------------------------------------------
   /rooms/{roomId}/data:
     x-swagger-router-controller: botData
     get:
@@ -7151,6 +7873,188 @@ paths:
           $ref: "#/responses/401"
         403:
           $ref: "#/responses/403"
+        default:
+          $ref: "#/responses/genericError"
+
+# ---------------------------------------------------------------------------
+  /roomTypes/{key}/writers:
+    x-swagger-router-controller: roomTypes
+    delete:
+      security:
+        - jwt: []
+      summary: Delete roomType's writers
+      tags: [ roomType ]
+      description: >-
+        Remove all users from a roomType's list of authorized writers.
+      operationId: deleteRoomTypeWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+             The id or name of the roomType.
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The roomType is no longer write-protected.
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    get:
+      security:
+        - jwt: []
+      summary: Get roomType writers
+      tags: [ roomTypes ]
+      description: >-
+        Returns a list of users permitted to modify this roomType. DOES NOT
+        use wildcards.
+      operationId: getRoomTypeWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the roomType for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+      responses:
+        200:
+          description: >-
+            Success, returns the users having write permission to the roomType
+            metadata.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/UsersResponse"
+              description: >-
+                The users having write permission to the roomType metadata.
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      security:
+        - jwt: []
+      summary: Add roomTypes writer
+      tags: [ roomTypes ]
+      description: >-
+         Add one or more users to a roomType's list of authorized writers.
+      operationId: postRoomTypeWriters
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the roomType for which the authorized list of
+            users are to be obtained.
+          required: true
+          type: string
+        -
+          name: queryBody
+          description: Request body.
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+            description: >
+              User name or id
+      responses:
+        201:
+          description: >-
+            One or more of the valid users were added to the list of authorized
+            writers.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/RoomTypeWriterResponse"
+              description: >-
+                The users who have write permission to the roomType metadata.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+            $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+# ---------------------------------------------------------------------------
+  /roomTypes/{key}/writers/{userNameOrId}:
+    x-swagger-router-controller: roomTypes
+    get:
+      security:
+        - jwt: []
+      tags: [ roomType ]
+      summary: Get roomType's writers
+      description: >-
+        Determine whether a user is an authorized writer for a roomType.
+        If user is unauthorized, there is no writer by this name for this
+        roomType.
+      operationId: getRoomTypeWriter
+      parameters:
+      -
+        name: key
+        in: path
+        description: The id or name of the roomType
+        required: true
+        type: string
+      - name: userNameOrId
+        in: "path"
+        description: The id or name of the user
+        required: true
+        type: string
+      responses:
+        200:
+          description: Success, return authorized user
+          schema:
+            $ref: "#/definitions/UsersResponse"
+        404:
+          description: userNameOrId does not identify a User
+    delete:
+      security:
+        - jwt: []
+      summary: Delete roomType writer
+      tags: [ roomTypes ]
+      description: >-
+        Remove a user from a roomType's list of authorized writers.
+      operationId: deleteRoomTypeWriter
+      parameters:
+        -
+          name: key
+          in: path
+          description: >-
+            The id or name of the roomType
+          required: true
+          type: string
+        -
+          name: userNameOrId
+          in: path
+          description: >-
+            The username or the Id of the user
+          required: true
+          type: string
+      responses:
+        204:
+          description: >-
+            The user’s write permission has been revoked for the roomType.
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        404:
+          $ref: "#/responses/404"
         default:
           $ref: "#/responses/genericError"
 
@@ -11315,6 +12219,84 @@ definitions:
         description: >
           Timestamp at which the the write permission was modified
 
+  BotWriterResponse:
+    type: object
+    description: >
+      Users having write permission to the bot
+    properties:
+      botId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a bot
+      userId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a user having write permission to the bot
+      createdAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was created
+      updatedAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was modified
+
+  BotActionWriterResponse:
+    type: object
+    description: >
+      Users having write permission to the botAction
+    properties:
+      botActionId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a botAction
+      userId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a user having write permission to the botAction
+      createdAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was created
+      updatedAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was modified
+
+  BotDataWriterResponse:
+    type: object
+    description: >
+      Users having write permission to the botData
+    properties:
+      botDataId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a botData
+      userId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a user having write permission to the botData
+      createdAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was created
+      updatedAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was modified
+
   GeneratorWriterResponse:
     type: object
     description: >
@@ -11408,6 +12390,58 @@ definitions:
         readOnly: true
         description: >
           Id of a user having write permission to the perspective
+      createdAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was created
+      updatedAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was modified
+
+  RoomWriterResponse:
+    type: object
+    description: >
+      Users having write permission to the room
+    properties:
+      roomId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a room
+      userId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a user having write permission to the room
+      createdAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was created
+      updatedAt:
+        readOnly: true
+        type: string
+        description: >
+          Timestamp at which the the write permission was modified
+
+  RoomTypeWriterResponse:
+    type: object
+    description: >
+      Users having write permission to the roomType
+    properties:
+      roomTypeId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a roomType
+      userId:
+        type: string
+        readOnly: true
+        description: >
+          Id of a user having write permission to the roomType
       createdAt:
         readOnly: true
         type: string

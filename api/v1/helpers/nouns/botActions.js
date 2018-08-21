@@ -24,4 +24,9 @@ module.exports = {
   baseUrl: '/v1/botActions',
   model: BotActions,
   modelName: 'botActions',
+
+  // define the associations that are to be deleted here
+  belongsToManyAssoc: {
+    users: 'writers',
+  },
 }; // exports

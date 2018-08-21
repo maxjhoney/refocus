@@ -25,6 +25,10 @@ module.exports = {
   fieldScopeMap: {
     botUI: 'botUI',
   },
+  // define the associations that are to be deleted here
+  belongsToManyAssoc: {
+    users: 'writers',
+  },
   getScopes: ['botUI'],
   baseUrl: '/v1/bots',
   model: Bots,

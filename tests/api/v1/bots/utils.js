@@ -136,6 +136,9 @@ module.exports = {
   createStandard() {
     return tu.db.Bot.create(standard);
   },
+  getBotToCreate() {
+    return JSON.parse(JSON.stringify(standard));
+  },
 
   forceDelete(done) {
     tu.forceDelete(tu.db.Bot, testStartTime)

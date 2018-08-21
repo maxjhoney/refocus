@@ -256,7 +256,6 @@ describe('tests/api/v1/events/get.js >', () => {
       if (err) {
         return done(err);
       }
-
       expect(res.body.length).to.equal(TWO);
       done();
     });

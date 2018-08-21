@@ -12,6 +12,10 @@
 'use strict';
 
 const helper = require('../helpers/nouns/rooms');
+const doDeleteAllAssoc = require('../helpers/verbs/doDeleteAllBToMAssoc');
+const doDeleteOneAssoc = require('../helpers/verbs/doDeleteOneBToMAssoc');
+const doGetWriters = require('../helpers/verbs/doGetWriters');
+const doPostWriters = require('../helpers/verbs/doPostWriters');
 const doDelete = require('../helpers/verbs/doDelete');
 const doFind = require('../helpers/verbs/doFind');
 const doGet = require('../helpers/verbs/doGet');
@@ -85,5 +89,74 @@ module.exports = {
   postRooms(req, res, next) {
     doPost(req, res, next, helper);
   },
+
+  /**
+   * GET /rooms/{key}/writers
+   *
+   * Returns a list of users permitted to modify this room. DOES NOT use
+   * wildcards.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  getRoomWriters(req, res, next) {
+    doGetWriters.getWriters(req, res, next, helper);
+  }, // getRoomWriters
+
+  /**
+   * POST /rooms/{key}/writers
+   *
+   * Add one or more users to a room's list of authorized writers.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  postRoomWriters(req, res, next) {
+    doPostWriters(req, res, next, helper);
+  }, // postRoomWriters
+
+  /**
+   * GET /rooms/{key}/writers/{userNameOrId}
+   *
+   * Determine whether a user is an authorized writer for a Room. If user is
+   * unauthorized, there is no writer by this name for this room.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  getRoomWriter(req, res, next) {
+    doGetWriters.getWriter(req, res, next, helper);
+  }, // getRoomWriter
+
+  /**
+   * DELETE /rooms/{key}/writers/{userNameOrId}
+   *
+   * Remove a user from a room's list of authorized writers.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  deleteRoomWriter(req, res, next) {
+    const userNameOrId = req.swagger.params.userNameOrId.value;
+    doDeleteOneAssoc(req, res, next, helper,
+        helper.belongsToManyAssoc.users, userNameOrId);
+  }, // deleteRoomWriter
+
+  /**
+   * DELETE /rooms/{keys}/writers
+   *
+   * Deletes all the writers associated with this resource.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+  */
+  deleteRoomWriters(req, res, next) {
+    doDeleteAllAssoc(req, res, next, helper, helper.belongsToManyAssoc.users);
+  }, // deleteRoomWriters
 
 }; // exports

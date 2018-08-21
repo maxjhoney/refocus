@@ -15,6 +15,10 @@ const u = require('../helpers/verbs/utils');
 const httpStatus = require('../constants').httpStatus;
 const jwtUtil = require('../../../utils/jwtUtil');
 const helper = require('../helpers/nouns/bots');
+const doDeleteAllAssoc = require('../helpers/verbs/doDeleteAllBToMAssoc');
+const doDeleteOneAssoc = require('../helpers/verbs/doDeleteOneBToMAssoc');
+const doGetWriters = require('../helpers/verbs/doGetWriters');
+const doPostWriters = require('../helpers/verbs/doPostWriters');
 const doDelete = require('../helpers/verbs/doDelete');
 const doFind = require('../helpers/verbs/doFind');
 const doPatch = require('../helpers/verbs/doPatch');
@@ -202,5 +206,74 @@ module.exports = {
     })
     .catch((err) => u.handleError(next, err, helper.modelName));
   }, // heartbeat
+
+  /**
+   * GET /bots/{key}/writers
+   *
+   * Returns a list of users permitted to modify this bot. DOES NOT use
+   * wildcards.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  getBotWriters(req, res, next) {
+    doGetWriters.getWriters(req, res, next, helper);
+  }, // getBotWriters
+
+  /**
+   * POST /bots/{key}/writers
+   *
+   * Add one or more users to a bot's list of authorized writers.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  postBotWriters(req, res, next) {
+    doPostWriters(req, res, next, helper);
+  }, // postBotWriters
+
+  /**
+   * GET /bots/{key}/writers/{userNameOrId}
+   *
+   * Determine whether a user is an authorized writer for a Bot. If user is
+   * unauthorized, there is no writer by this name for this bot.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  getBotWriter(req, res, next) {
+    doGetWriters.getWriter(req, res, next, helper);
+  }, // getBotWriter
+
+  /**
+   * DELETE /bots/{key}/writers/{userNameOrId}
+   *
+   * Remove a user from a bot's list of authorized writers.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+   */
+  deleteBotWriter(req, res, next) {
+    const userNameOrId = req.swagger.params.userNameOrId.value;
+    doDeleteOneAssoc(req, res, next, helper,
+        helper.belongsToManyAssoc.users, userNameOrId);
+  }, // deleteBotWriter
+
+  /**
+   * DELETE /bots/{keys}/writers
+   *
+   * Deletes all the writers associated with this resource.
+   *
+   * @param {IncomingMessage} req - The request object
+   * @param {ServerResponse} res - The response object
+   * @param {Function} next - The next middleware function in the stack
+  */
+  deleteBotWriters(req, res, next) {
+    doDeleteAllAssoc(req, res, next, helper, helper.belongsToManyAssoc.users);
+  }, // deleteBotWriters
 
 }; // exports
