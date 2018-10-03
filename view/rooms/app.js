@@ -939,10 +939,13 @@ function setupColumns() {
  * @returns {String} - Where the window should be redirected to.
  */
 function getRedirectUrl(url, roomId) {
+  console.log("url: ", url);
+  console.log("roomId: ", roomId);
   const urlParameters = url.includes('?') ?
     url.split('?')[ONE] : '';
   const redirectUrl = url.includes('keepParams=true') ?
     `/rooms/${roomId}?${urlParameters}` : `/rooms/${roomId}`;
+  console.log("redirectUrl: ", redirectUrl);
   return redirectUrl;
 }
 
@@ -983,6 +986,7 @@ window.onload = () => {
     }
 
     if (parseInt(ROOM_ID, 10) !== response.id) {
+      console.log("Inside where redirect is called");
       const redirectUrl = getRedirectUrl(window.location.href, response.id);
       window.location.replace(redirectUrl);
     }
