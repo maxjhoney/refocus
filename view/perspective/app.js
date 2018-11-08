@@ -154,8 +154,12 @@ function setupSocketIOClient(persBody) {
    * Add the perspective name as a query param so that it's available server-
    * side on connect.
    */
-  const namespace = u.getNamespaceString(persBody) +
-    `?p=${persBody.name}`;
+  const namespace = `/perspectives`;
+  const options = {};
+  options.query = {
+    p: persBody.name,
+    roomString: u.getNamespaceString(persBody),
+  };
 
   /*
    * If transProtocol is set, initialize the socket.io client with the
@@ -166,7 +170,6 @@ function setupSocketIOClient(persBody) {
    * clientProtocol string. Finally, we split the comma-seperated values into
    * an array.
    */
-  const options = {};
   if (_transProtocol) {
     options.transports = _transProtocol.replace(/\s*,\s*/g, ',').split(',');
   }

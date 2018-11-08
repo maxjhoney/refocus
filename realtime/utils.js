@@ -17,6 +17,7 @@ const redisStore = require('../cache/sampleStore');
 const logger = require('winston');
 const featureToggles = require('feature-toggles');
 const Op = require('sequelize').Op;
+const connectedRooms = require('./connectedRooms');
 const eventName = {
   add: 'refocus.internal.realtime.subject.add',
   upd: 'refocus.internal.realtime.subject.update',
@@ -310,6 +311,27 @@ function initializePerspectiveNamespace(inst, io) {
   return io;
 }
 
+function addEventsForPerspectives(io) {
+  io.of('perspectives').on('connect', (socket) => {
+    // join and track room
+    const room = socket.handshake.query.roomString;
+    socket.join(room);
+    connectedRooms.addRoom(room);
+
+    // un-track room on disconnect
+    socket.on('disconnect', () => {
+      const allSockets = Object.values(io.of('perspectives').connected);
+      const roomIsActive = allSockets.some((socket) =>
+        Object.keys(socket.rooms).includes(room)
+      );
+
+      if (!roomIsActive) {
+        connectedRooms.removeRoom(room);
+      }
+    });
+  });
+}
+
 /**
  * Initializes a socketIO namespace based on the bot object.
  * @param {Instance} inst - The perspective instance.
@@ -450,6 +472,7 @@ module.exports = {
   getPerspectiveNamespaceString,
   initializeBotNamespace,
   initializePerspectiveNamespace,
+  addEventsForPerspectives,
   isIpWhitelisted,
   parseObject,
   shouldIEmitThisObj,
