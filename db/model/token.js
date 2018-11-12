@@ -119,6 +119,7 @@ module.exports = function token(seq, dataTypes) {
    * @returns {Promise<Integer>} number of records deleted
    */
   Token.deleteUnused = function (since) {
+    console.log('Token.deleteUnused', since);
     try {
       // eslint-disable-next-line no-magic-numbers
       const millis = ms(since) || 0;

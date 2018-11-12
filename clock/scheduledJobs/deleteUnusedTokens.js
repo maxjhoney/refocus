@@ -37,5 +37,6 @@ module.exports = {
    *  activity=worker logging
    */
   execute: () => Token.deleteUnused(since)
+    .tap((numDeleted) => console.log('deleteUnusedTokens', numDeleted))
     .then((numDeleted) => ({ recordCount: numDeleted, errorCount: 0 })),
 };
